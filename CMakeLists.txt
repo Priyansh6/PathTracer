@@ -19,4 +19,4 @@ set(CMAKE_CXX_EXTENSIONS        OFF)
 project ("PathTracer")
 
 # Add source to this project's executable.
-add_executable (PathTracer "PathTracer.cpp" "PathTracer.h")
+add_executable (PathTracer "PathTracer.cpp")

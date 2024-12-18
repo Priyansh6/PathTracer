@@ -1,6 +1,5 @@
-﻿#include <print>
-
-#include "PathTracer.h"
+﻿#include <iostream>
+#include <print>
 
 int main()
 {

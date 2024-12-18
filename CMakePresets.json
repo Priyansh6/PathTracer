@@ -31,10 +31,6 @@
       "toolset": {
         "value": "host=x64",
         "strategy": "external"
-      },
-      "cacheVariables": {
-        "ENABLE_CPPCHECK_DEFAULT": "TRUE",
-        "ENABLE_CLANG_TIDY_DEFAULT": "TRUE"
       }
     },
     {
@@ -65,7 +61,8 @@
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl",
         "CMAKE_BUILD_TYPE": "Debug",
-        "ENABLE_DEVELOPER_MODE": "ON"
+        "ENABLE_DEVELOPER_MODE": "ON",
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX"
       }
     },
     {
@@ -113,11 +110,14 @@
         "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl",
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "-Werror -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic /std:c++23"
+        "CMAKE_CXX_FLAGS": "-Werror -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "intelliSenseMode": "windows-clang-x64"
+          "intelliSenseMode": "windows-clang-x64",
+          "intelliSenseOptions": {
+            "useCompilerDefaults": true
+          }
         }
       }
     },
