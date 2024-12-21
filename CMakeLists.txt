@@ -20,4 +20,6 @@ project("PathTracer")
 add_executable(PathTracer
         src/PathTracer.cpp
         src/vec3.h
-        src/Vec3.cpp)
+        src/Vec3.cpp
+        src/Ray.cpp
+        src/Ray.h)
