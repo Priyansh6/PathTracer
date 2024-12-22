@@ -2,9 +2,6 @@
 
 #include <cmath>
 #include <cstdlib>
-#include <format>
-#include <iostream>
-#include <ostream>
 
 Vec3::Vec3() : m_v{ 0, 0, 0 } {}
 Vec3::Vec3(const double x, const double y, const double z) : m_v{ x, y, z } {}
@@ -67,19 +64,3 @@ Vec3 Vec3::operator/(const double val) const { return { m_v[0] / val, m_v[1] / v
     (m_v[0] * other.m_v[1]) - (m_v[1] * other.m_v[0]) };
 }
 [[nodiscard]] Vec3 Vec3::unit_vector() const { return *this / length(); }
-
-constexpr auto std::formatter<Vec3>::parse(auto& ctx)
-{
-  auto it = ctx.begin();
-  if (it == ctx.end()) { return it; }
-  if (*it != '}') {
-    std::println(std::cerr, "Invalid format args for Vec3");
-    std::quick_exit(EXIT_FAILURE);
-  }
-  return it;
-}
-
-auto std::formatter<Vec3>::format(const Vec3& v, auto& ctx) const
-{
-  return std::format_to(ctx.out(), "({},{},{})", v.x(), v.y(), v.z());
-}

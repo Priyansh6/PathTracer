@@ -3,7 +3,10 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdlib>
 #include <format>
+#include <iostream>
+#include <ostream>
 
 class Vec3;
 // Point3 is just an alias for Vec3, but useful for geometric clarity in the code.
@@ -47,8 +50,14 @@ private:
 
 template<> struct std::formatter<Vec3>
 {
-  constexpr auto parse(auto& ctx);
-  auto format(const Vec3& v, auto& ctx) const;
+  constexpr auto parse(auto& ctx)
+  {
+    auto it = ctx.begin();
+    if (it == ctx.end() || *it == '}') { return it; }
+    std::println(std::cerr, "Invalid format args for Vec3");
+    std::quick_exit(EXIT_FAILURE);
+  }
+  auto format(const Vec3& v, auto& ctx) const { return std::format_to(ctx.out(), "({},{},{})", v.x(), v.y(), v.z()); }
 };
 
 #endif// VEC3_H
