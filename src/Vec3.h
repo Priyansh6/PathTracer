@@ -5,8 +5,6 @@
 #include <cstddef>
 #include <cstdlib>
 #include <format>
-#include <iostream>
-#include <ostream>
 
 class Vec3;
 // Point3 is just an alias for Vec3, but useful for geometric clarity in the code.
