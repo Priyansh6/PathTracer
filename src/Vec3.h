@@ -54,7 +54,8 @@ template<> struct std::formatter<Vec3>
   {
     auto it = ctx.begin();
     if (it == ctx.end() || *it == '}') { return it; }
-    std::println(std::cerr, "Invalid format args for Vec3");
+    // Invalid format args for Vec3
+    // TODO: Check performance of std::format_error with exceptions enabled
     std::quick_exit(EXIT_FAILURE);
   }
   auto format(const Vec3& v, auto& ctx) const { return std::format_to(ctx.out(), "({},{},{})", v.x(), v.y(), v.z()); }
