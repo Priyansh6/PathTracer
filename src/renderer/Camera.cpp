@@ -1,10 +1,10 @@
 #include "Camera.h"
 #include "Colour.h"
-#include "Hittable.h"
-#include "Ray.h"
 #include "Utils.h"
-#include "Vec3.h"
-#include "World.h"
+#include "entities/Hittable.h"
+#include "entities/Ray.h"
+#include "entities/Vec3.h"
+#include "entities/World.h"
 
 #include <iostream>
 #include <limits>

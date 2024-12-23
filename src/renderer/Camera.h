@@ -2,9 +2,9 @@
 #define CAMERA_H
 
 #include "Colour.h"
-#include "Ray.h"
-#include "Vec3.h"
-#include "World.h"
+#include "entities/Ray.h"
+#include "entities/Vec3.h"
+#include "entities/World.h"
 
 class Camera
 {

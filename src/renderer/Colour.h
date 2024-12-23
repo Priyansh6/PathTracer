@@ -1,7 +1,7 @@
 #ifndef COLOUR_H
 #define COLOUR_H
 
-#include "Vec3.h"
+#include "entities/Vec3.h"
 
 #include <iostream>
 

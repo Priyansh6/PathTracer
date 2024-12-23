@@ -14,26 +14,29 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-project("PathTracer")
+project(PathTracer)
 
 set(SOURCES
         src/PathTracer.cpp
-        src/Vec3.h
-        src/Ray.h
-        src/Ray.cpp
+        src/entities/Vec3.h
+        src/entities/Ray.h
+        src/entities/Ray.cpp
         src/Config.h
-        src/Colour.h
-        src/Colour.cpp
-        src/Camera.h
-        src/Camera.cpp
-        src/Hittable.h
-        src/Sphere.h
-        src/Sphere.cpp
+        src/renderer/Colour.h
+        src/renderer/Colour.cpp
+        src/renderer/Camera.h
+        src/renderer/Camera.cpp
+        src/entities/Hittable.h
+        src/entities/Sphere.h
+        src/entities/Sphere.cpp
         src/Utils.h
         src/Utils.cpp
-        src/World.h
-        src/World.cpp
+        src/entities/World.h
+        src/entities/World.cpp
 )
 
 # Add source to this project's executable.
 add_executable(PathTracer ${SOURCES})
+
+set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
+target_include_directories(PathTracer PRIVATE ${SRC_DIR})

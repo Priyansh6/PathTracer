@@ -1,6 +1,6 @@
-﻿#include "Camera.h"
-#include "Config.h"
-#include "World.h"
+﻿#include "Config.h"
+#include "entities/World.h"
+#include "renderer/Camera.h"
 
 #include <cstdlib>
 
