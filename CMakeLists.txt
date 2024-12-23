@@ -16,10 +16,21 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 project("PathTracer")
 
-# Add source to this project's executable.
-add_executable(PathTracer
+set(SOURCES
         src/PathTracer.cpp
         src/Vec3.h
-        src/Vec3.cpp
+        src/Ray.h
         src/Ray.cpp
-        src/Ray.h)
+        src/Config.h
+        src/Colour.h
+        src/Colour.cpp
+        src/Camera.h
+        src/Hittable.h
+        src/Sphere.h
+        src/Sphere.cpp
+        src/Utils.h
+        src/World.h
+)
+
+# Add source to this project's executable.
+add_executable(PathTracer ${SOURCES})
