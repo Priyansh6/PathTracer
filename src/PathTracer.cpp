@@ -27,7 +27,7 @@ Colour ray_colour(const Ray& r, const World& world)
 int main()
 {
   // Initialise the world.
-  constexpr World world{ default_world::spheres };
+  const World world(default_world::spheres);
 
   // Render the image.
   std::println("P3\n{} {}\n{}", config::image_width, config::image_height, colour::maximum_value);

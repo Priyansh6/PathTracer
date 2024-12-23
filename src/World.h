@@ -17,7 +17,7 @@ class World
 {
 public:
   World() = delete;
-  explicit constexpr World(utils::input_range_of<Sphere> auto&& spheres)
+  explicit World(utils::input_range_of<Sphere> auto&& spheres)
     : m_spheres(std::ranges::to<std::vector<Sphere>>(spheres))
   {}
 
