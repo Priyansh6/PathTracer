@@ -18,13 +18,9 @@ class World
 public:
   World() = delete;
   explicit World(utils::input_range_of<Sphere> auto&& spheres)
-    : m_spheres(std::ranges::to<std::vector<Sphere>>(spheres))
-  {}
+    : m_spheres(std::ranges::to<std::vector<Sphere>>(spheres)) {};
 
-  bool hit(const Ray& r, const double t_min, const double t_max, HitRecord& rec) const
-  {
-    return hit<Sphere>(m_spheres, r, t_min, t_max, rec);
-  }
+  bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const;
 
 private:
   std::vector<Sphere> m_spheres;

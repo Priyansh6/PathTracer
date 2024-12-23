@@ -1,27 +1,43 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "Config.h"
+#include "Colour.h"
+#include "Ray.h"
 #include "Vec3.h"
+#include "World.h"
 
-namespace camera {
-constexpr double actual_aspect_ratio =
-  static_cast<double>(config::image_width) / static_cast<double>(config::image_height);
+class Camera
+{
+public:
+  Camera() = delete;
+  explicit Camera(double aspect_ratio, int image_width, int samples_per_pixel);
+  void render(const World& world) const;
 
-constexpr double viewport_height = 2.0;
-constexpr double viewport_width = viewport_height * actual_aspect_ratio;
+private:
+  static Colour ray_colour(const Ray& r, const World& world);
+  [[nodiscard]] Ray get_ray(int x, int y) const;
 
-constexpr double focal_length = 1.0;
-constexpr Point3 camera_centre(0, 0, 0);
+  // Camera configuration.
+  double m_aspect_ratio;
+  int m_image_width;
+  int m_image_height;
+  int m_samples_per_pixel;
 
-constexpr Vec3 viewport_u = { viewport_width, 0, 0 };
-constexpr Vec3 viewport_v = { 0, -viewport_height, 0 };
+  // Viewport configuration.
+  double m_viewport_height;
+  double m_viewport_width;
 
-constexpr Vec3 pixel_delta_u = viewport_u / config::image_width;
-constexpr Vec3 pixel_delta_v = viewport_v / config::image_height;
+  // Camera position.
+  double m_focal_length;
+  Point3 m_camera_centre;
 
-constexpr Point3 viewport_upper_left = camera_centre - Vec3(0, 0, focal_length) - (viewport_u / 2) - (viewport_v / 2);
-constexpr Point3 pixel00_loc = viewport_upper_left + (0.5 * (pixel_delta_u + pixel_delta_v));
-}// namespace camera
+  // Viewport vectors and points
+  Vec3 m_viewport_u;
+  Vec3 m_viewport_v;
+  Vec3 m_pixel_delta_u;
+  Vec3 m_pixel_delta_v;
+  Point3 m_viewport_upper_left;
+  Point3 m_pixel00_loc;
+};
 
 #endif// CAMERA_H

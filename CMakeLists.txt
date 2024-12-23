@@ -25,11 +25,14 @@ set(SOURCES
         src/Colour.h
         src/Colour.cpp
         src/Camera.h
+        src/Camera.cpp
         src/Hittable.h
         src/Sphere.h
         src/Sphere.cpp
         src/Utils.h
+        src/Utils.cpp
         src/World.h
+        src/World.cpp
 )
 
 # Add source to this project's executable.

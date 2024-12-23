@@ -8,8 +8,9 @@
 using Colour = Vec3;
 
 namespace colour {
-constexpr int maximum_value = 255;
-}
+// Num possibilities for a colour component.
+constexpr int colour_range = 256;
+}// namespace colour
 
 // Writes the colour to the output stream in the format "r g b\n" given a Colour vector containing values in the
 // range [0,1].
