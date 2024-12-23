@@ -1,6 +1,9 @@
 #ifndef VEC3_H
 #define VEC3_H
 
+#include "Utils.h"
+
+
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -85,6 +88,29 @@ public:
       (m_v[0] * other.m_v[1]) - (m_v[1] * other.m_v[0]) };
   }
   [[nodiscard]] constexpr Vec3 unit_vector() const { return *this / length(); }
+  static Vec3 random() { return { utils::random_double(), utils::random_double(), utils::random_double() }; }
+  static Vec3 random(const double min, const double max)
+  {
+    return { utils::random_double(min, max), utils::random_double(min, max), utils::random_double(min, max) };
+  }
+  static Vec3 random_unit_vector()
+  {
+    constexpr double min_len_squared = 1e-160;
+    while (true) {
+      const Vec3 p = random(-1, 1);
+      if (const double len_sq = p.length_squared(); min_len_squared < len_sq && len_sq <= 1) {
+        return p / sqrt(len_sq);
+      }
+    }
+  }
+  static Vec3 random_facing_normal(const Vec3& normal)
+  {
+    if (const Vec3 on_unit_sphere = random_unit_vector(); on_unit_sphere.dot(normal) > 0.0) {
+      return on_unit_sphere;// In the same direction as the normal.
+    } else {
+      return -on_unit_sphere;// In the opposite direction to the normal.
+    }
+  }
 
 private:
   std::array<double, 3> m_v;

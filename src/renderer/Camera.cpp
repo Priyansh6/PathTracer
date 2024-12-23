@@ -15,13 +15,14 @@ constexpr double default_viewport_height = 2.0;
 constexpr double default_focal_length = 1.0;
 constexpr Point3 default_camera_centre = { 0, 0, 0 };
 
+constexpr double diffuse_reflection_coefficient = 0.5;
 constexpr Colour background_start_colour = { 1.0, 1.0, 1.0 };
 constexpr Colour background_end_colour = { 0.5, 0.7, 1.0 };
 
-Camera::Camera(const double aspect_ratio, const int image_width, const int samples_per_pixel)
+Camera::Camera(const double aspect_ratio, const int image_width, const int samples_per_pixel, const int max_depth)
   : m_aspect_ratio(aspect_ratio), m_image_width(image_width),
     m_image_height(static_cast<int>(image_width / aspect_ratio)), m_samples_per_pixel(samples_per_pixel),
-    m_viewport_height(default_viewport_height), m_focal_length(default_focal_length),
+    m_max_depth(max_depth), m_viewport_height(default_viewport_height), m_focal_length(default_focal_length),
     m_camera_centre(default_camera_centre)
 {
   const double actual_aspect_ratio = static_cast<double>(image_width) / static_cast<double>(m_image_height);
@@ -58,16 +59,26 @@ void Camera::render(const World& world) const
   std::println(std::clog, "\rDone.                      ");
 }
 
-Colour Camera::ray_colour(const Ray& r, const World& world)
+Colour Camera::ray_colour(const Ray& r, const World& world) const
 {
-  if (HitRecord rec{}; world.hit(r, 0, std::numeric_limits<double>::infinity(), rec)) {
-    return (rec.normal + Colour(1, 1, 1)) / 2;
+  HitRecord rec{};
+  double curr_diffuse_reflection_coefficient = 1.0;
+  Ray curr_ray = r;
+  int depth = m_max_depth;
+
+  // Perform bounces
+  while (world.hit(curr_ray, std::numeric_limits<double>::epsilon(), std::numeric_limits<double>::infinity(), rec)) {
+    const Vec3 direction = rec.normal + Vec3::random_unit_vector();
+    curr_ray = Ray(rec.point, direction);
+    curr_diffuse_reflection_coefficient *= diffuse_reflection_coefficient;
+    // If we've reached the maximum depth, return black.
+    if (--depth == 0) { return { 0, 0, 0 }; }
   }
 
-  // If no objects are hit, return the background colour.
+  // Background colour
   const Vec3 unit_direction = r.direction().unit_vector();
   const double a = (unit_direction.y() + 1.0) / 2;
-  return (1.0 - a) * background_start_colour + a * background_end_colour;
+  return curr_diffuse_reflection_coefficient * ((1.0 - a) * background_start_colour + a * background_end_colour);
 }
 
 Ray Camera::get_ray(const int x, const int y) const

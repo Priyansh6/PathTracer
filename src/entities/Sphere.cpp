@@ -17,11 +17,11 @@ bool Sphere::hit(const Ray& r, const double min_t, const double max_t, HitRecord
 
   const auto discriminant_sqrt = std::sqrt(discriminant);
 
-  // Find the nearest root that lies in the acceptable range.
+  // Find the nearest root that lies (non-inclusive) in the acceptable range.
   auto root = (h - discriminant_sqrt) / a;
-  if (root < min_t || root > max_t) {
+  if (root <= min_t || root >= max_t) {
     root = (h + discriminant_sqrt) / a;
-    if (root < min_t || root > max_t) { return false; }
+    if (root <= min_t || root >= max_t) { return false; }
   }
 
   rec.t = root;

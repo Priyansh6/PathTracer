@@ -10,11 +10,11 @@ class Camera
 {
 public:
   Camera() = delete;
-  explicit Camera(double aspect_ratio, int image_width, int samples_per_pixel);
+  explicit Camera(double aspect_ratio, int image_width, int samples_per_pixel, int max_depth);
   void render(const World& world) const;
 
 private:
-  static Colour ray_colour(const Ray& r, const World& world);
+  [[nodiscard]] Colour ray_colour(const Ray& r, const World& world) const;
   [[nodiscard]] Ray get_ray(int x, int y) const;
 
   // Camera configuration.
@@ -22,6 +22,7 @@ private:
   int m_image_width;
   int m_image_height;
   int m_samples_per_pixel;
+  int m_max_depth;
 
   // Viewport configuration.
   double m_viewport_height;
