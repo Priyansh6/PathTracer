@@ -5,17 +5,18 @@
 #include "entities/Ray.h"
 #include "entities/Vec3.h"
 #include "entities/World.h"
+#include "materials/Scatter.h"
 
 #include <iostream>
 #include <limits>
 #include <ostream>
 #include <print>
+#include <variant>
 
 constexpr double default_viewport_height = 2.0;
 constexpr double default_focal_length = 1.0;
 constexpr Point3 default_camera_centre = { 0, 0, 0 };
 
-constexpr double diffuse_reflection_coefficient = 0.5;
 constexpr Colour background_start_colour = { 1.0, 1.0, 1.0 };
 constexpr Colour background_end_colour = { 0.5, 0.7, 1.0 };
 
@@ -62,15 +63,20 @@ void Camera::render(const World& world) const
 Colour Camera::ray_colour(const Ray& r, const World& world) const
 {
   HitRecord rec{};
-  double curr_diffuse_reflection_coefficient = 1.0;
+  Colour curr_diffuse_reflection_coefficient = { 1.0, 1.0, 1.0 };
   Ray curr_ray = r;
   int depth = m_max_depth;
 
   // Perform bounces
   while (world.hit(curr_ray, std::numeric_limits<double>::epsilon(), std::numeric_limits<double>::infinity(), rec)) {
-    const Vec3 direction = rec.normal + Vec3::random_unit_vector();
-    curr_ray = Ray(rec.point, direction);
-    curr_diffuse_reflection_coefficient *= diffuse_reflection_coefficient;
+    if (ScatterRecord s_rec{};
+      std::visit([&](const auto& material) { return Scatter{}(material, curr_ray, rec, s_rec); }, *rec.material)) {
+      curr_diffuse_reflection_coefficient *= s_rec.attenuation;
+      curr_ray = s_rec.scattered;
+    } else {
+      return { 0, 0, 0 };
+    }
+
     // If we've reached the maximum depth, return black.
     if (--depth == 0) { return { 0, 0, 0 }; }
   }

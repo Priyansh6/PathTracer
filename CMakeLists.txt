@@ -33,6 +33,11 @@ set(SOURCES
         src/Utils.cpp
         src/entities/World.h
         src/entities/World.cpp
+        src/materials/Material.h
+        src/materials/Lambertian.h
+        src/materials/Metal.h
+        src/materials/Scatter.cpp
+        src/materials/Scatter.h
 )
 
 # Add source to this project's executable.

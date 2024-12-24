@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <format>
+#include <limits>
 
 class Vec3;
 // Point3 is just an alias for Vec3, but useful for geometric clarity in the code.
@@ -39,6 +40,13 @@ public:
     m_v[0] += other.m_v[0];
     m_v[1] += other.m_v[1];
     m_v[2] += other.m_v[2];
+    return *this;
+  }
+  constexpr Vec3& operator*=(const Vec3& other)
+  {
+    m_v[0] *= other.m_v[0];
+    m_v[1] *= other.m_v[1];
+    m_v[2] *= other.m_v[2];
     return *this;
   }
   constexpr Vec3& operator*=(const double val)
@@ -88,6 +96,14 @@ public:
       (m_v[0] * other.m_v[1]) - (m_v[1] * other.m_v[0]) };
   }
   [[nodiscard]] constexpr Vec3 unit_vector() const { return *this / length(); }
+  [[nodiscard]] constexpr bool near_zero() const
+  {
+    return (std::abs(m_v[0]) < std::numeric_limits<double>::epsilon())
+           && (std::abs(m_v[1]) < std::numeric_limits<double>::epsilon())
+           && (std::abs(m_v[2]) < std::numeric_limits<double>::epsilon());
+  }
+  [[nodiscard]] constexpr Vec3 reflect(const Vec3& normal) const { return *this - (2 * this->dot(normal) * normal); }
+
   static Vec3 random() { return { utils::random_double(), utils::random_double(), utils::random_double() }; }
   static Vec3 random(const double min, const double max)
   {
@@ -95,8 +111,8 @@ public:
   }
   static Vec3 random_unit_vector()
   {
-    constexpr double min_len_squared = 1e-160;
     while (true) {
+      constexpr double min_len_squared = 1e-160;
       const Vec3 p = random(-1, 1);
       if (const double len_sq = p.length_squared(); min_len_squared < len_sq && len_sq <= 1) {
         return p / sqrt(len_sq);

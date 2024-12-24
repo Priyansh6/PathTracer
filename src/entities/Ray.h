@@ -6,7 +6,7 @@
 class Ray
 {
 public:
-  Ray() = delete;
+  Ray() = default;
   explicit Ray(const Point3& origin, const Vec3& direction);
 
   [[nodiscard]] const Point3& origin() const;

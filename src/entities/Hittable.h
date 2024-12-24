@@ -4,6 +4,8 @@
 #include "Ray.h"
 #include "Utils.h"
 #include "Vec3.h"
+#include "materials/Material.h"
+#include "renderer/Colour.h"
 
 #include <concepts>
 
@@ -13,6 +15,13 @@ struct HitRecord
   Vec3 normal;
   double t{ 0 };
   bool front_face{ false };
+  const Material* material{};
+};
+
+struct ScatterRecord
+{
+  Ray scattered;
+  Colour attenuation;
 };
 
 template<class T>

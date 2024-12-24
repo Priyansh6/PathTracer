@@ -31,6 +31,7 @@ bool Sphere::hit(const Ray& r, const double min_t, const double max_t, HitRecord
   const bool front_face = r.direction().dot(outward_normal) < 0;
   rec.front_face = front_face;
   rec.normal = front_face ? outward_normal : -outward_normal;
+  rec.material = &m_material;
 
   return true;
 }
