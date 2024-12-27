@@ -38,6 +38,7 @@ set(SOURCES
         src/materials/Metal.h
         src/materials/Scatter.cpp
         src/materials/Scatter.h
+        src/materials/Dielectric.h
 )
 
 # Add source to this project's executable.

@@ -6,7 +6,6 @@
 class Metal
 {
 public:
-  Metal() = delete;
   constexpr explicit Metal(const Colour& albedo, const double fuzz) : m_albedo(albedo), m_fuzz(fuzz) {}
 
   [[nodiscard]] constexpr Colour get_albedo() const { return m_albedo; }

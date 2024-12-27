@@ -3,7 +3,7 @@
 
 #include "Utils.h"
 
-
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -80,7 +80,7 @@ public:
   }
   constexpr Vec3 operator/(const double val) const { return { m_v[0] / val, m_v[1] / val, m_v[2] / val }; }
 
-  [[nodiscard]] constexpr double length() const { return std::sqrt(length_squared()); }
+  [[nodiscard]] double length() const { return std::sqrt(length_squared()); }
   [[nodiscard]] constexpr double length_squared() const
   {
     return (m_v[0] * m_v[0]) + (m_v[1] * m_v[1]) + (m_v[2] * m_v[2]);
@@ -96,13 +96,20 @@ public:
       (m_v[0] * other.m_v[1]) - (m_v[1] * other.m_v[0]) };
   }
   [[nodiscard]] constexpr Vec3 unit_vector() const { return *this / length(); }
-  [[nodiscard]] constexpr bool near_zero() const
+  [[nodiscard]] bool near_zero() const
   {
     return (std::abs(m_v[0]) < std::numeric_limits<double>::epsilon())
            && (std::abs(m_v[1]) < std::numeric_limits<double>::epsilon())
            && (std::abs(m_v[2]) < std::numeric_limits<double>::epsilon());
   }
   [[nodiscard]] constexpr Vec3 reflect(const Vec3& normal) const { return *this - (2 * this->dot(normal) * normal); }
+  [[nodiscard]] constexpr Vec3 refract(const Vec3& normal, const double etai_over_etat) const
+  {
+    const auto cos_theta = std::min(this->dot(normal), 1.0);
+    const Vec3 r_out_perp = etai_over_etat * (*this + cos_theta * normal);
+    const Vec3 r_out_parallel = -std::sqrt(std::abs(1.0 - r_out_perp.length_squared())) * normal;
+    return r_out_perp + r_out_parallel;
+  }
 
   static Vec3 random() { return { utils::random_double(), utils::random_double(), utils::random_double() }; }
   static Vec3 random(const double min, const double max)
