@@ -7,39 +7,57 @@
 #include "entities/World.h"
 #include "materials/Scatter.h"
 
+#include <cmath>
 #include <iostream>
 #include <limits>
 #include <ostream>
 #include <print>
 #include <variant>
 
-constexpr double default_viewport_height = 2.0;
-constexpr double default_focal_length = 1.0;
-constexpr Point3 default_camera_centre = { 0, 0, 0 };
-
-constexpr Colour background_start_colour = { 1.0, 1.0, 1.0 };
-constexpr Colour background_end_colour = { 0.5, 0.7, 1.0 };
-
 constexpr double shadow_acne_epsilon = 0.0001;// Epsilon to prevent shadow acne.
 
-Camera::Camera(const double aspect_ratio, const int image_width, const int samples_per_pixel, const int max_depth)
-  : m_aspect_ratio(aspect_ratio), m_image_width(image_width),
-    m_image_height(static_cast<int>(image_width / aspect_ratio)), m_samples_per_pixel(samples_per_pixel),
-    m_max_depth(max_depth), m_viewport_height(default_viewport_height), m_focal_length(default_focal_length),
-    m_camera_centre(default_camera_centre)
+Camera::Camera(const double aspect_ratio,
+  const int image_width,
+  const int samples_per_pixel,
+  const int max_depth,
+  const double vertical_fov,
+  const Point3& look_from,
+  const Point3& look_at,
+  const Vec3& vup,
+  const double defocus_angle,
+  const double focus_dist)
 {
+  // NOLINTBEGIN(*-prefer-member-initializer)
+  m_image_width = image_width;
+  m_image_height = static_cast<int>(image_width / aspect_ratio);
+  m_samples_per_pixel = samples_per_pixel;
+  m_max_depth = max_depth;
+  m_centre = look_from;
+  const double theta = utils::degrees_to_radians(vertical_fov);
+  const double h = std::tan(theta / 2);
+  const double viewport_height = 2 * h * focus_dist;
   const double actual_aspect_ratio = static_cast<double>(image_width) / static_cast<double>(m_image_height);
+  const double viewport_width = viewport_height * actual_aspect_ratio;
 
-  m_viewport_width = m_viewport_height * actual_aspect_ratio;
+  const Vec3 w = (look_from - look_at).unit_vector();
+  const Vec3 u = vup.cross(w).unit_vector();
+  const Vec3 v = w.cross(u);
 
-  m_viewport_u = { m_viewport_width, 0, 0 };
-  m_viewport_v = { 0, -m_viewport_height, 0 };
+  const Vec3 viewport_u = viewport_width * u;
+  const Vec3 viewport_v = viewport_height * -v;
 
-  m_pixel_delta_u = m_viewport_u / image_width;
-  m_pixel_delta_v = m_viewport_v / m_image_height;
+  m_pixel_delta_u = viewport_u / image_width;
+  m_pixel_delta_v = viewport_v / m_image_height;
 
-  m_viewport_upper_left = m_camera_centre - Vec3(0, 0, m_focal_length) - (m_viewport_u / 2) - (m_viewport_v / 2);
-  m_pixel00_loc = m_viewport_upper_left + ((m_pixel_delta_u + m_pixel_delta_v) / 2);
+  const Point3 viewport_upper_left = m_centre - (focus_dist * w) - (viewport_u / 2) - (viewport_v / 2);
+  m_pixel00_loc = viewport_upper_left + ((m_pixel_delta_u + m_pixel_delta_v) / 2);
+
+  // Calculate the camera defocus disk basis vectors.
+  const double defocus_radius = focus_dist * std::tan(utils::degrees_to_radians(defocus_angle / 2));
+  m_defocus_angle = defocus_angle;
+  m_defocus_disk_u = u * defocus_radius;
+  m_defocus_disk_v = v * defocus_radius;
+  // NOLINTEND(*-prefer-member-initializer)
 }
 
 void Camera::render(const World& world) const
@@ -86,16 +104,25 @@ Colour Camera::ray_colour(const Ray& r, const World& world) const
   // Background colour
   const Vec3 unit_direction = r.direction().unit_vector();
   const double a = (unit_direction.y() + 1.0) / 2;
-  return curr_diffuse_reflection_coefficient * ((1.0 - a) * background_start_colour + a * background_end_colour);
+  return curr_diffuse_reflection_coefficient
+         * ((1.0 - a) * world.background_bottom_colour() + a * world.background_top_colour());
 }
 
+// Construct a camera ray originating from the defocus disk and directed at randomly sampled
+// point around the pixel location x, y.
 Ray Camera::get_ray(const int x, const int y) const
 {
-  // Construct a camera ray originating from the origin and directed at randomly sampled
-  // point around the pixel location x, y.
   const Point3 pixel_sample = m_pixel00_loc + ((x + utils::random_double() - 0.5) * m_pixel_delta_u)
                               + ((y + utils::random_double() - 0.5) * m_pixel_delta_v);
-  const Vec3 ray_direction = pixel_sample - m_camera_centre;
+  const Vec3 ray_direction = pixel_sample - m_centre;
+  const Point3 ray_origin = (m_defocus_angle <= 0) ? m_centre : defocus_disk_sample();
 
-  return Ray(m_camera_centre, ray_direction);
+  return Ray(ray_origin, ray_direction);
+}
+
+Point3 Camera::defocus_disk_sample() const
+{
+  // Returns a random point in the camera defocus disk.
+  auto p = utils::random_in_unit_disk();
+  return m_centre + (p.first * m_defocus_disk_u) + (p.second * m_defocus_disk_v);
 }

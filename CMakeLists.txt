@@ -32,7 +32,6 @@ set(SOURCES
         src/Utils.h
         src/Utils.cpp
         src/entities/World.h
-        src/entities/World.cpp
         src/materials/Material.h
         src/materials/Lambertian.h
         src/materials/Metal.h
