@@ -20,6 +20,8 @@ constexpr Point3 default_camera_centre = { 0, 0, 0 };
 constexpr Colour background_start_colour = { 1.0, 1.0, 1.0 };
 constexpr Colour background_end_colour = { 0.5, 0.7, 1.0 };
 
+constexpr double shadow_acne_epsilon = 0.0001;// Epsilon to prevent shadow acne.
+
 Camera::Camera(const double aspect_ratio, const int image_width, const int samples_per_pixel, const int max_depth)
   : m_aspect_ratio(aspect_ratio), m_image_width(image_width),
     m_image_height(static_cast<int>(image_width / aspect_ratio)), m_samples_per_pixel(samples_per_pixel),
@@ -68,7 +70,7 @@ Colour Camera::ray_colour(const Ray& r, const World& world) const
   int depth = m_max_depth;
 
   // Perform bounces
-  while (world.hit(curr_ray, std::numeric_limits<double>::epsilon(), std::numeric_limits<double>::infinity(), rec)) {
+  while (world.hit(curr_ray, shadow_acne_epsilon, std::numeric_limits<double>::infinity(), rec)) {
     if (ScatterRecord s_rec{};
       std::visit([&](const auto& material) { return Scatter{}(material, curr_ray, rec, s_rec); }, *rec.material)) {
       curr_diffuse_reflection_coefficient *= s_rec.attenuation;

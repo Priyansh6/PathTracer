@@ -4,6 +4,8 @@
 #include "Metal.h"
 #include "entities/Hittable.h"
 #include "entities/Ray.h"
+#include <algorithm>
+#include <cmath>
 
 bool Scatter::operator()(const Lambertian& lambertian,
   const Ray& /*r_in*/,
@@ -28,15 +30,22 @@ bool Scatter::operator()(const Metal& metal, const Ray& r_in, const HitRecord& r
   s_rec.attenuation = metal.get_albedo();
   return reflected.dot(rec.normal) > 0;
 }
+
 bool Scatter::operator()(const Dielectric& dielectric,
   const Ray& r_in,
   const HitRecord& rec,
   ScatterRecord& s_rec) const
 {
   const double ri = rec.front_face ? (1.0 / dielectric.get_refraction_index()) : dielectric.get_refraction_index();
-  const Vec3 refracted = r_in.direction().unit_vector().refract(rec.normal, ri);
+  const Vec3 unit_dir = r_in.direction().unit_vector();
+
+  const double cos_theta = std::min(-unit_dir.dot(rec.normal), 1.0);
+  const double sin_theta = std::sqrt(1.0 - (cos_theta * cos_theta));
+
+  const bool cannot_refract = ri * sin_theta > 1.0;
+  const Vec3 direction = cannot_refract ? unit_dir.reflect(rec.normal) : unit_dir.refract(rec.normal, ri);
 
   s_rec.attenuation = Colour(1.0, 1.0, 1.0);
-  s_rec.scattered = Ray(rec.point, refracted);
+  s_rec.scattered = Ray(rec.point, direction);
   return true;
 }

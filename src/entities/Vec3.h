@@ -103,9 +103,10 @@ public:
            && (std::abs(m_v[2]) < std::numeric_limits<double>::epsilon());
   }
   [[nodiscard]] constexpr Vec3 reflect(const Vec3& normal) const { return *this - (2 * this->dot(normal) * normal); }
+  // Precondition: this and the normal are both unit vectors.
   [[nodiscard]] constexpr Vec3 refract(const Vec3& normal, const double etai_over_etat) const
   {
-    const auto cos_theta = std::min(this->dot(normal), 1.0);
+    const auto cos_theta = std::min(-(this->dot(normal)), 1.0);
     const Vec3 r_out_perp = etai_over_etat * (*this + cos_theta * normal);
     const Vec3 r_out_parallel = -std::sqrt(std::abs(1.0 - r_out_perp.length_squared())) * normal;
     return r_out_perp + r_out_parallel;
