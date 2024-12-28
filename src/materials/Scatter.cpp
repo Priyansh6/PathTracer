@@ -2,10 +2,21 @@
 #include "Dielectric.h"
 #include "Lambertian.h"
 #include "Metal.h"
+#include "Utils.h"
 #include "entities/Hittable.h"
 #include "entities/Ray.h"
 #include <algorithm>
 #include <cmath>
+
+namespace {
+double reflectance(const double cosine, const double refraction_index)
+{
+  // Use Schlick's approximation for reflectance.
+  auto r0 = (1 - refraction_index) / (1 + refraction_index);
+  r0 = r0 * r0;
+  return r0 + ((1 - r0) * std::pow(1 - cosine, 5));// NOLINT(*-magic-numbers)
+}
+}// namespace
 
 bool Scatter::operator()(const Lambertian& lambertian,
   const Ray& /*r_in*/,
@@ -43,7 +54,9 @@ bool Scatter::operator()(const Dielectric& dielectric,
   const double sin_theta = std::sqrt(1.0 - (cos_theta * cos_theta));
 
   const bool cannot_refract = ri * sin_theta > 1.0;
-  const Vec3 direction = cannot_refract ? unit_dir.reflect(rec.normal) : unit_dir.refract(rec.normal, ri);
+  const Vec3 direction = cannot_refract || reflectance(cos_theta, ri) > utils::random_double()
+                           ? unit_dir.reflect(rec.normal)
+                           : unit_dir.refract(rec.normal, ri);
 
   s_rec.attenuation = Colour(1.0, 1.0, 1.0);
   s_rec.scattered = Ray(rec.point, direction);
