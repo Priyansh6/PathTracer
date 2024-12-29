@@ -88,7 +88,7 @@ Colour Camera::ray_colour(const Ray& r, const World& world) const
   int depth = m_max_depth;
 
   // Perform bounces
-  while (world.hit(curr_ray, shadow_acne_epsilon, std::numeric_limits<double>::infinity(), rec)) {
+  while (world.hit(curr_ray, shadow_acne_epsilon, std::numeric_limits<double>::max(), rec)) {
     if (ScatterRecord s_rec{};
       std::visit([&](const auto& material) { return Scatter{}(material, curr_ray, rec, s_rec); }, *rec.material)) {
       curr_diffuse_reflection_coefficient *= s_rec.attenuation;

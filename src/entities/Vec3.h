@@ -140,15 +140,14 @@ private:
   std::array<double, 3> m_v;
 };
 
-template<> struct std::formatter<Vec3>
+template<>
+struct std::formatter<Vec3>
 {
   constexpr auto parse(auto& ctx)
   {
     auto it = ctx.begin();
-    if (it == ctx.end() || *it == '}') { return it; }
-    // Invalid format args for Vec3
-    // TODO: Check performance of std::format_error with exceptions enabled
-    std::quick_exit(EXIT_FAILURE);
+    if (it != ctx.end() && *it != '}') { throw std::format_error("Invalid format args for Vec3"); }
+    return it;
   }
   auto format(const Vec3& v, auto& ctx) const { return std::format_to(ctx.out(), "({},{},{})", v.x(), v.y(), v.z()); }
 };

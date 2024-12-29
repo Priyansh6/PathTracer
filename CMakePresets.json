@@ -70,6 +70,18 @@
       }
     },
     {
+      "name": "windows-msvc-release-debuginfo",
+      "displayName": "msvc Release (with debug info)",
+      "description": "Target Windows with the msvc compiler, release with debug info build type",
+      "inherits": "conf-windows-common",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl",
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
       "name": "windows-msvc-release",
       "displayName": "msvc Release",
       "description": "Target Windows with the msvc compiler, release build type",
@@ -77,7 +89,8 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl",
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc /fp:fast",
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
@@ -89,7 +102,7 @@
         "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl",
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX"
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -102,6 +115,23 @@
       }
     },
     {
+      "name": "windows-clang-release-debuginfo",
+      "displayName": "clang Release (with debug info)",
+      "description": "Target Windows with the clang compiler, release with debug info build type",
+      "inherits": "conf-windows-common",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "intelliSenseMode": "windows-clang-x64"
+        }
+      }
+    },
+    {
       "name": "windows-clang-release",
       "displayName": "clang Release",
       "description": "Target Windows with the clang compiler, release build type",
@@ -109,7 +139,8 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl",
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc /fp:fast"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -129,6 +160,17 @@
       }
     },
     {
+      "name": "unixlike-clang-release-debuginfo",
+      "displayName": "clang Release (with debug info)",
+      "description": "Target Unix-like OS with the clang compiler, release with debug info build type",
+      "inherits": "conf-unixlike-common",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
       "name": "unixlike-clang-release",
       "displayName": "clang Release",
       "description": "Target Unix-like OS with the clang compiler, release build type",
@@ -136,7 +178,7 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     }
   ]
