@@ -52,6 +52,24 @@ inline std::vector<Sphere> generate_spheres()
 }
 }// namespace default_world
 
+namespace three_spheres_world {
+constexpr Colour background_top_colour = { 0.5, 0.7, 1 };
+constexpr Colour background_bottom_colour = { 1, 1, 1 };
+
+inline std::vector<Sphere> generate_spheres()
+{
+  // NOLINTBEGIN(*-magic-numbers)
+  std::vector<Sphere> spheres;
+  spheres.emplace_back(Point3(0, -100.5, -1), 100, Lambertian(Colour(0.8, 0.8, 0.0)));// Ground sphere
+  spheres.emplace_back(Point3(0, 0, -1.2), 0.5, Lambertian(Colour(0.1, 0.2, 0.5)));// Centre sphere
+  spheres.emplace_back(Point3(-1, 0, -1), 0.5, Dielectric(1.5));// Left sphere
+  spheres.emplace_back(Point3(-1, 0, -1), 0.4, Dielectric(1.0 / 1.5));// Bubble sphere
+  spheres.emplace_back(Point3(1, 0, -1), 0.5, Metal(Colour(0.8, 0.6, 0.2), 1.0));// Right sphere
+  return spheres;
+  // NOLINTEND(*-magic-numbers)
+}
+}// namespace three_spheres_world
+
 class World
 {
 public:

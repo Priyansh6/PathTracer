@@ -114,8 +114,8 @@ Ray Camera::get_ray(const int x, const int y) const
 {
   const Point3 pixel_sample = m_pixel00_loc + ((x + utils::random_double() - 0.5) * m_pixel_delta_u)
                               + ((y + utils::random_double() - 0.5) * m_pixel_delta_v);
-  const Vec3 ray_direction = pixel_sample - m_centre;
   const Point3 ray_origin = (m_defocus_angle <= 0) ? m_centre : defocus_disk_sample();
+  const Vec3 ray_direction = pixel_sample - ray_origin;
 
   return Ray(ray_origin, ray_direction);
 }
@@ -123,6 +123,6 @@ Ray Camera::get_ray(const int x, const int y) const
 Point3 Camera::defocus_disk_sample() const
 {
   // Returns a random point in the camera defocus disk.
-  auto p = utils::random_in_unit_disk();
-  return m_centre + (p.first * m_defocus_disk_u) + (p.second * m_defocus_disk_v);
+  auto [x, y] = utils::random_in_unit_disk();
+  return m_centre + (x * m_defocus_disk_u) + (y * m_defocus_disk_v);
 }

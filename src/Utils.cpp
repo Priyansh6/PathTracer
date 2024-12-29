@@ -1,6 +1,5 @@
 #include "Utils.h"
 
-#include <cmath>
 #include <numbers>
 #include <random>
 #include <utility>
@@ -39,6 +38,6 @@ std::pair<double, double> utils::random_in_unit_disk()
   while (true) {
     const double x = random_double(-1, 1);
     const double y = random_double(-1, 1);
-    if (std::sqrt((x * x) + (y * y)) < 1) { return { x, y }; }
+    if ((x * x) + (y * y) < 1) { return { x, y }; }
   }
 }
