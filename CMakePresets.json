@@ -77,7 +77,7 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc /fp:fast",
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc /fp:fast /GS-",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     },
@@ -89,7 +89,7 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc /fp:fast",
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc /fp:fast /GS-",
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
@@ -123,7 +123,7 @@
         "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc /fp:fast"
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc /fp:fast /GS-"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -140,7 +140,7 @@
         "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl",
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc /fp:fast"
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc /fp:fast /GS-"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
