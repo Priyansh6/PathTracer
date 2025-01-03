@@ -50,6 +50,8 @@
           "Darwin"
         ]
       },
+      "cacheVariables": {
+      }, 
       "vendor": {
         "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
           "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
@@ -156,7 +158,8 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror"
       }
     },
     {
@@ -167,7 +170,8 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror -ffast-math"
       }
     },
     {
@@ -178,7 +182,8 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_BUILD_TYPE": "Release"
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror -ffast-math"
       }
     }
   ]
