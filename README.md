@@ -37,8 +37,16 @@ cmake --build .
 ## Run
 
 To run the path tracer, execute the following command in the build directory. It will output the rendered image in PPM
-format.
+format to a file named `output.ppm`.
+
+### In Linux
 
 ```bash
-./PathTracer > image.ppm
+./PathTracer
+```
+
+### In Windows (PowerShell)
+
+```bash
+./PathTracer.exe
 ```

@@ -140,16 +140,18 @@ private:
   std::array<double, 3> m_v;
 };
 
-template<>
-struct std::formatter<Vec3>
-{
-  constexpr auto parse(auto& ctx)
-  {
-    auto it = ctx.begin();
-    if (it != ctx.end() && *it != '}') { throw std::format_error("Invalid format args for Vec3"); }
-    return it;
-  }
-  auto format(const Vec3& v, auto& ctx) const { return std::format_to(ctx.out(), "({},{},{})", v.x(), v.y(), v.z()); }
-};
+// Useful for debugging and logging Vec3 objects. However, this requires enabling exceptions.
+// template<>
+// struct std::formatter<Vec3>
+// {
+//   constexpr auto parse(auto& ctx)
+//   {
+//     auto it = ctx.begin();
+//     if (it != ctx.end() && *it != '}') { throw std::format_error("Invalid format args for Vec3"); }
+//     return it;
+//   }
+//   auto format(const Vec3& v, auto& ctx) const { return std::format_to(ctx.out(), "({},{},{})", v.x(), v.y(), v.z());
+//   }
+// };
 
 #endif// VEC3_H

@@ -1,7 +1,14 @@
-﻿# CMakeList.txt : CMake project for PathTracer, include source and define
-# project specific logic here.
-#
-cmake_minimum_required(VERSION 3.29)
+﻿cmake_minimum_required(VERSION 3.29)
+
+include(FetchContent)
+
+FetchContent_Declare(
+        SDL3
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+        GIT_TAG release-3.2.16
+        SYSTEM
+)
+FetchContent_MakeAvailable(SDL3)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -17,7 +24,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(PathTracer)
 
 set(SOURCES
-        src/PathTracer.cpp
+        src/Main.cpp
         src/entities/Vec3.h
         src/entities/Ray.h
         src/entities/Ray.cpp
@@ -38,10 +45,23 @@ set(SOURCES
         src/materials/Scatter.cpp
         src/materials/Scatter.h
         src/materials/Dielectric.h
+        src/renderer/Renderer.cpp
+        src/renderer/Renderer.h
+        src/renderer/PixelWriter.h
+        src/renderer/PpmPixelWriter.cpp
+        src/renderer/PpmPixelWriter.h
 )
 
-# Add source to this project's executable.
 add_executable(PathTracer ${SOURCES})
+
+target_link_libraries(PathTracer PRIVATE SDL3::SDL3)
+
+add_custom_command(
+        TARGET PathTracer
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:SDL3::SDL3> $<TARGET_FILE_DIR:PathTracer>
+        COMMENT "Copying SDL3.dll to executable directory"
+)
 
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 target_include_directories(PathTracer PRIVATE ${SRC_DIR})

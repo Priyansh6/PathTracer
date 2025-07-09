@@ -77,10 +77,10 @@ public:
   explicit World(const Colour& background_top_colour,
     const Colour& background_bottom_colour,
     utils::input_range_of<Sphere> auto&& spheres)
-    : m_background_top_colour(background_top_colour), m_background_bottom_colour(background_bottom_colour),
-      m_spheres(std::ranges::to<std::vector<Sphere>>(spheres)) {};
+    : m_background_top_colour{ background_top_colour }, m_background_bottom_colour{ background_bottom_colour },
+      m_spheres{ std::ranges::to<std::vector<Sphere>>(spheres) } {};
 
-  bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const
+  bool hit(const Ray& r, const double t_min, const double t_max, HitRecord& rec) const
   {
     HitRecord temp_rec{};
     auto closest_so_far = t_max;

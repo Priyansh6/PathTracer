@@ -6,7 +6,7 @@
 class Lambertian
 {
 public:
-  constexpr explicit Lambertian(const Colour& albedo) : m_albedo(albedo) {}
+  constexpr explicit Lambertian(const Colour& albedo) : m_albedo{ albedo } {}
 
   [[nodiscard]] constexpr Colour get_albedo() const { return m_albedo; }
 

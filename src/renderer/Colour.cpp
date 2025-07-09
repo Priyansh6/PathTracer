@@ -12,7 +12,7 @@ double linear_to_gamma(const double linear_component)
 }
 }// namespace
 
-void write_colour(std::ostream& out, const Colour& pixel_colour)
+void colour::write_colour(std::ostream& out, const Colour& pixel_colour)
 {
   auto r = pixel_colour.x();
   auto g = pixel_colour.y();
@@ -23,9 +23,9 @@ void write_colour(std::ostream& out, const Colour& pixel_colour)
   g = linear_to_gamma(g);
   b = linear_to_gamma(b);
 
-  const int r_byte = static_cast<int>(colour::colour_range * std::clamp(r, 0.0, 0.999));
-  const int g_byte = static_cast<int>(colour::colour_range * std::clamp(g, 0.0, 0.999));
-  const int b_byte = static_cast<int>(colour::colour_range * std::clamp(b, 0.0, 0.999));
+  const int r_byte = static_cast<int>(colour_range * std::clamp(r, 0.0, 0.999));
+  const int g_byte = static_cast<int>(colour_range * std::clamp(g, 0.0, 0.999));
+  const int b_byte = static_cast<int>(colour_range * std::clamp(b, 0.0, 0.999));
 
   std::println(out, "{} {} {}", r_byte, g_byte, b_byte);
 }

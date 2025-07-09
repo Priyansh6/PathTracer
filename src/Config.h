@@ -3,22 +3,32 @@
 
 #include "entities/Vec3.h"
 
-namespace config {
-// Image configuration
+#include <string>
+
+namespace app_metadata {
+constexpr std::string name = "Path Tracer";
+constexpr std::string version = "1.0";
+constexpr std::string id = "path-tracer";
+}// namespace app_metadata
+
+namespace window_config {
+constexpr std::string title = "Path Tracer";
 constexpr double aspect_ratio = 16.0 / 9.0;// Ratio of width to height
 constexpr int image_width = 1200;// Image width in pixels
+}// namespace window_config
 
-// Camera configuration
+namespace camera_config {
 constexpr double vertical_fov = 20;// Vertical field of view in degrees
 constexpr Point3 look_from = { 13, 2, 3 };// Camera position
 constexpr Point3 look_at = { 0, 0, 0 };// Point the camera is looking at
 constexpr Vec3 vup = { 0, 1, 0 };// Up vector
 constexpr double defocus_angle = 0.6;// Variation angle of rays through each pixel
 constexpr double focus_dist = 10;// Distance from camera look_from point to plane of perfect focus
+}// namespace camera_config
 
-// Rendering configuration
+namespace rt_config {
 constexpr int samples_per_pixel = 500;// Number of samples per pixel
 constexpr int max_depth = 50;// Maximum bounces per ray
-}// namespace config
+}// namespace rt_config
 
 #endif// CONFIG_H

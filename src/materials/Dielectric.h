@@ -4,7 +4,7 @@
 class Dielectric
 {
 public:
-  constexpr explicit Dielectric(const double refraction_index) : m_refraction_index(refraction_index) {}
+  constexpr explicit Dielectric(const double refraction_index) : m_refraction_index{ refraction_index } {}
 
   [[nodiscard]] constexpr double get_refraction_index() const { return m_refraction_index; }
 

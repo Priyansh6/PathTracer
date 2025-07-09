@@ -6,7 +6,7 @@
 class Metal
 {
 public:
-  constexpr explicit Metal(const Colour& albedo, const double fuzz) : m_albedo(albedo), m_fuzz(fuzz) {}
+  constexpr explicit Metal(const Colour& albedo, const double fuzz) : m_albedo{ albedo }, m_fuzz{ fuzz } {}
 
   [[nodiscard]] constexpr Colour get_albedo() const { return m_albedo; }
   [[nodiscard]] constexpr double get_fuzz() const { return m_fuzz; }
