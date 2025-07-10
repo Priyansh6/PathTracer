@@ -23,6 +23,7 @@ Pre-requisites:
 - CMake (>= 3.29)
 - C++-23 compatible compiler (ideally msvc or clang on windows/clang on linux)
 - On Linux if using clang: `clang-tools`, `libc++-dev`, `libc++abi-dev`
+- On Linux, the prerequisites at [this link](https://github.com/libsdl-org/SDL/blob/release-3.2.x/docs/README-linux.md) for the SDL3 library.
 
 You can build the project automatically using JetBrains CLion, Windows Visual Studio or manually using CMake.
 To build manually with CMake, run the following commands (for the example preset `windows-clang-release`) in the project

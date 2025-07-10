@@ -159,7 +159,7 @@
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror -fno-exceptions"
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror"
       }
     },
     {
@@ -171,7 +171,7 @@
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror -ffast-math -fno-exceptions"
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror -ffast-math"
       }
     },
     {
@@ -183,7 +183,7 @@
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror -ffast-math -fno-exceptions"
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror -ffast-math"
       }
     }
   ]

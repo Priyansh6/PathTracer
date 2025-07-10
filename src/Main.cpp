@@ -1,5 +1,4 @@
-﻿#include "../out/build/windows-clang-release-debuginfo/_deps/onetbb-src/include/oneapi/tbb/global_control.h"
-#include "Config.h"
+﻿#include "Config.h"
 #include "entities/World.h"
 #include "renderer/Camera.h"
 #include "renderer/PpmWriter.h"
@@ -11,6 +10,7 @@
 #include <cxxopts.hpp>
 #include <fstream>
 #include <iostream>
+#include <oneapi/tbb/global_control.h>
 #include <optional>
 #include <print>
 #include <string>
