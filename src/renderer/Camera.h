@@ -4,6 +4,9 @@
 #include "entities/Ray.h"
 #include "entities/Vec3.h"
 
+// Camera class represents a perspective camera in a 3D scene.
+// It is responsible for generating rays that simulate the camera view.
+// The camera can also simulate defocus by adding a random offset to the rays.
 class Camera
 {
 public:

@@ -8,6 +8,10 @@
 #include "entities/Ray.h"
 #include "entities/World.h"
 
+// The Renderer class is responsible for rendering a scene defined by a World and a Camera.
+// It can output the rendered image to a PPM file or display it in a window.
+// The rendering process involves sampling rays from the camera, tracing them through the scene,
+// and shading the resulting hits with materials defined in the World.
 class Renderer
 {
 public:

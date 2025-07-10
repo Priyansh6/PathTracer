@@ -14,8 +14,8 @@
 #include <iostream>
 #include <limits>
 #include <oneapi/tbb/concurrent_queue.h>
+#include <oneapi/tbb/parallel_for.h>
 #include <oneapi/tbb/task_group.h>
-#include <ostream>
 #include <variant>
 #include <vector>
 
@@ -31,26 +31,23 @@ void Renderer::render_to_ppm(const World& world,
   PpmWriter& ppm_writer) const
 {
   std::vector buffer{ static_cast<std::size_t>(m_image_width * m_image_height), rgba::black_rgba };
-  for (int y = 0; y < m_image_height; y++) {
-    std::print(std::clog, "\rScan Lines remaining: {:0>5}", m_image_height - y);
-    std::clog.flush();
+  tbb::parallel_for(0, m_image_height, [&](const int y) {
     for (int x = 0; x < m_image_width; x++) {
       const Colour pixel_colour = sample_pixel(x, y, world, samples_per_pixel, max_depth);
       buffer[(y * m_image_width) + x] = RGBA{ pixel_colour };
     }
-  }
-  ppm_writer.write_buffer(buffer);
-  std::println(std::clog, "\rDone.                      ");
-}
+  });
 
+  ppm_writer.write_buffer(buffer);
+}
 
 void Renderer::render_to_window(const World& world,
   const int samples_per_pixel,
   const int max_depth,
   WindowController& window_controller) const
 {
-  if (!window_controller.init()) {
-    std::cerr << "Failed to initialize pixel writer.\n";
+  if (!window_controller.init_window()) {
+    std::cerr << "Failed to initialize window.\n";
     return;
   }
   std::vector<Tile> tiles;
@@ -60,7 +57,7 @@ void Renderer::render_to_window(const World& world,
   std::size_t remaining_tiles = tiles.size();
 
   std::vector buffer{ static_cast<std::size_t>(m_image_width * m_image_height), rgba::black_rgba };
-  tbb::concurrent_bounded_queue<Tile> result_tile_queue;
+  tbb::concurrent_queue<Tile> result_tile_queue;
   tbb::task_group tg;
 
   for (const Tile& tile : tiles) {
@@ -76,14 +73,17 @@ void Renderer::render_to_window(const World& world,
     });
   }
 
+  // Event Loop
   while (remaining_tiles > 0) {
-    Tile tile{};
-    result_tile_queue.pop(tile);
-    remaining_tiles--;
-    window_controller.present_tile(tile, buffer);
+    if (window_controller.poll_events_until_quit()) { return; }
+    if (Tile tile{}; result_tile_queue.try_pop(tile)) {
+      remaining_tiles--;
+      window_controller.update_tile(tile, buffer);
+    }
+    window_controller.present();
   }
 
-  tg.wait();
+  window_controller.wait_for_quit();
 }
 
 Colour Renderer::sample_pixel(const int x,

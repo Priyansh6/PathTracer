@@ -3,6 +3,9 @@
 
 #include "Vec3.h"
 
+// Ray class represents a ray in 3D space.
+// It is defined by an origin point and a direction vector.
+// The Ray class provides methods to compute points along the ray at a given distance.
 class Ray
 {
 public:

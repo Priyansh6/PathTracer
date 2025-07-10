@@ -17,6 +17,10 @@ constexpr int colour_range = 256;
 constexpr Colour black{ 0, 0, 0 };
 }// namespace colour
 
+// RGBA is a class that represents a colour in the RGBA format.
+// It stores the colour data as a single 32-bit unsigned integer.
+// The components are stored in the order: Red, Green, Blue, Alpha.
+// The constructor accepts either a 32-bit integer or a Colour object.
 class RGBA
 {
 public:

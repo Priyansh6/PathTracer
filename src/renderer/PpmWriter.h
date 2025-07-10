@@ -6,6 +6,9 @@
 #include <ostream>
 #include <vector>
 
+// The PpmWriter class is responsible for writing pixel data to a PPM (Portable Pixmap) file.
+// It takes the image dimensions and an output stream, and provides a method to write a buffer of RGBA pixel data
+// in the PPM format, specifically in the ASCII P3 format.
 class PpmWriter
 {
 public:

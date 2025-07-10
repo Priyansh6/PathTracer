@@ -8,6 +8,10 @@
 
 #include <algorithm>
 
+// Sphere class represents a sphere in 3D space.
+// It is defined by its centre, radius, and material.
+// The class provides a method to check if a ray intersects the sphere,
+// returning a HitRecord containing intersection details if it does.
 class Sphere
 {
 public:

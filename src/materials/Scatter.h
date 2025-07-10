@@ -7,6 +7,16 @@
 #include "entities/Hittable.h"
 #include "entities/Ray.h"
 
+// ScatterRecord holds the result of scattering a ray off a material.
+// It contains the scattered ray and the attenuation colour.
+struct ScatterRecord
+{
+  Ray scattered;
+  Colour attenuation;
+};
+
+// Scatter is a visitor struct that defines how to scatter rays based on the material type.
+// It uses the visitor pattern to handle different material types: Lambertian, Metal, and Dielectric.
 struct Scatter
 {
   bool operator()(const Lambertian& lambertian, const Ray& /*r_in*/, const HitRecord& rec, ScatterRecord& s_rec) const;

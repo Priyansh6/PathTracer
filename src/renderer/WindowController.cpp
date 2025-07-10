@@ -4,6 +4,7 @@
 #include "Tile.h"
 
 #include <SDL3/SDL_error.h>
+#include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_pixels.h>
@@ -17,7 +18,15 @@
 
 WindowController::WindowController(const int width, const int height) : m_width{ width }, m_height{ height } {}
 
-bool WindowController::init()
+WindowController::~WindowController()
+{
+  if (m_texture) { SDL_DestroyTexture(m_texture); }
+  if (m_renderer) { SDL_DestroyRenderer(m_renderer); }
+  if (m_window) { SDL_DestroyWindow(m_window); }
+  SDL_Quit();
+}
+
+bool WindowController::init_window()
 {
   SDL_SetAppMetadata(app_metadata::name.c_str(), app_metadata::version.c_str(), app_metadata::id.c_str());
   if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -37,7 +46,24 @@ bool WindowController::init()
   return true;
 }
 
-void WindowController::present_tile(const Tile& tile, [[maybe_unused]] const std::vector<RGBA>& buffer)
+bool WindowController::poll_events_until_quit()
+{
+  SDL_Event event{};
+  while (SDL_PollEvent(&event)) {
+    if (event.type == SDL_EVENT_QUIT) { return true; }
+  }
+  return false;
+}
+
+void WindowController::wait_for_quit()
+{
+  SDL_Event event{};
+  while (SDL_WaitEvent(&event)) {
+    if (event.type == SDL_EVENT_QUIT) { return; }
+  }
+}
+
+void WindowController::update_tile(const Tile& tile, [[maybe_unused]] const std::vector<RGBA>& buffer)
 {
   // Define the rectangular area of the tile to lock.
   SDL_Rect lock_rect{};
@@ -64,7 +90,10 @@ void WindowController::present_tile(const Tile& tile, [[maybe_unused]] const std
     memcpy(dst, src, static_cast<size_t>(lock_rect.w) * pixel_size);
   }
   SDL_UnlockTexture(m_texture);
+}
 
+void WindowController::present()
+{
   SDL_RenderClear(m_renderer);
   SDL_RenderTexture(m_renderer, m_texture, nullptr, nullptr);
   SDL_RenderPresent(m_renderer);

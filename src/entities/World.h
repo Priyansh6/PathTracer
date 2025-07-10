@@ -70,6 +70,10 @@ inline std::vector<Sphere> generate_spheres()
 }
 }// namespace three_spheres_world
 
+// World class represents a 3D scene containing spheres.
+// It provides methods to check for ray intersections with the spheres,
+// and returns the background colours for rendering.
+// The World class is constructed with a background colour and a collection of spheres.
 class World
 {
 public:

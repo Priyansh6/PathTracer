@@ -8,13 +8,16 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
-#include <format>
 #include <limits>
 
 class Vec3;
 // Point3 is just an alias for Vec3, but useful for geometric clarity in the code.
 using Point3 = Vec3;
 
+// Vec3 class represents a 3D vector or point in space.
+// It provides various operations like addition, subtraction, multiplication, division,
+// dot product, cross product, and vector normalization.
+// It also includes methods for generating random vectors and unit vectors.
 class Vec3
 {
 public:
