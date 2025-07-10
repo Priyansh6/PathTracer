@@ -10,6 +10,7 @@
 #include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
+#include <SDL3/SDL_video.h>
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -20,9 +21,9 @@ WindowController::WindowController(const int width, const int height) : m_width{
 
 WindowController::~WindowController()
 {
-  if (m_texture) { SDL_DestroyTexture(m_texture); }
-  if (m_renderer) { SDL_DestroyRenderer(m_renderer); }
-  if (m_window) { SDL_DestroyWindow(m_window); }
+  if (m_texture != nullptr) { SDL_DestroyTexture(m_texture); }
+  if (m_renderer != nullptr) { SDL_DestroyRenderer(m_renderer); }
+  if (m_window != nullptr) { SDL_DestroyWindow(m_window); }
   SDL_Quit();
 }
 

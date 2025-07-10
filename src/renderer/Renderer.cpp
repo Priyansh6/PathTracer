@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "Colour.h"
+#include "Config.h"
 #include "PpmWriter.h"
 #include "Tile.h"
 #include "WindowController.h"
@@ -10,12 +11,15 @@
 #include "entities/World.h"
 #include "materials/Scatter.h"
 
+#include <SDL3/SDL_timer.h>
+#include <chrono>
 #include <cstddef>
 #include <iostream>
 #include <limits>
 #include <oneapi/tbb/concurrent_queue.h>
 #include <oneapi/tbb/parallel_for.h>
 #include <oneapi/tbb/task_group.h>
+#include <ostream>
 #include <variant>
 #include <vector>
 
@@ -31,12 +35,22 @@ void Renderer::render_to_ppm(const World& world,
   PpmWriter& ppm_writer) const
 {
   std::vector buffer{ static_cast<std::size_t>(m_image_width * m_image_height), rgba::black_rgba };
+
+  const auto start_time = std::chrono::steady_clock::now();
+
   tbb::parallel_for(0, m_image_height, [&](const int y) {
     for (int x = 0; x < m_image_width; x++) {
       const Colour pixel_colour = sample_pixel(x, y, world, samples_per_pixel, max_depth);
       buffer[(y * m_image_width) + x] = RGBA{ pixel_colour };
     }
   });
+
+  const auto end_time = std::chrono::steady_clock::now();
+  const auto duration = end_time - start_time;
+  std::println(std::clog,
+    "Rendering completed in {} seconds and {} milliseconds.",
+    std::chrono::duration_cast<std::chrono::seconds>(duration).count(),
+    std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() % 1000);// NOLINT(*-magic-numbers)
 
   ppm_writer.write_buffer(buffer);
 }
@@ -47,7 +61,7 @@ void Renderer::render_to_window(const World& world,
   WindowController& window_controller) const
 {
   if (!window_controller.init_window()) {
-    std::cerr << "Failed to initialize window.\n";
+    std::println(std::cerr, "Failed to initialize window.");
     return;
   }
   std::vector<Tile> tiles;
@@ -61,7 +75,7 @@ void Renderer::render_to_window(const World& world,
   tbb::task_group tg;
 
   for (const Tile& tile : tiles) {
-    tg.run([&] {
+    tg.run([&, tile] {
       for (int y = tile.y; y < tile.y + tile_size && y < m_image_height; ++y) {
         for (int x = tile.x; x < tile.x + tile_size && x < m_image_width; ++x) {
           const Colour pixel_colour = sample_pixel(x, y, world, samples_per_pixel, max_depth);
@@ -73,17 +87,28 @@ void Renderer::render_to_window(const World& world,
     });
   }
 
+  const auto start_time = std::chrono::steady_clock::now();
+
   // Event Loop
   while (remaining_tiles > 0) {
     if (window_controller.poll_events_until_quit()) { return; }
-    if (Tile tile{}; result_tile_queue.try_pop(tile)) {
+    bool was_updated = false;
+    Tile tile{};
+    while (result_tile_queue.try_pop(tile)) {
       remaining_tiles--;
       window_controller.update_tile(tile, buffer);
+      was_updated = true;
     }
-    window_controller.present();
+    if (was_updated) { window_controller.present(); }
+    SDL_Delay(window_config::min_frame_time_ms);// Prevent busy-waiting
   }
 
-  window_controller.wait_for_quit();
+  const auto end_time = std::chrono::steady_clock::now();
+  const auto duration = end_time - start_time;
+  std::println(std::clog,
+    "Rendering completed in {} seconds and {} milliseconds.",
+    std::chrono::duration_cast<std::chrono::seconds>(duration).count(),
+    std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() % 1000);// NOLINT(*-magic-numbers)
 }
 
 Colour Renderer::sample_pixel(const int x,

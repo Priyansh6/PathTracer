@@ -13,6 +13,7 @@
 #include <iostream>
 #include <optional>
 #include <print>
+#include <string>
 
 int main(int argc, char* argv[])
 {
@@ -26,7 +27,12 @@ int main(int argc, char* argv[])
     "The file which to store the rendered image in PPM format (only enabled with ppm output mode).",
     cxxopts::value<std::string>()->default_value("output.ppm"))("w,width",
     "The width of the resulting image in pixels",
-    cxxopts::value<int>()->default_value("1200"))("h,help", "Print usage information.");
+    cxxopts::value<int>()->default_value(std::to_string(window_config::default_width)))("b,max-bounces",
+    "The maximum number of bounces per ray.",
+    cxxopts::value<int>()->default_value(std::to_string(rt_config::default_max_depth)))("p,samples-per-pixel",
+    "The number of ray samples per pixel.",
+    cxxopts::value<int>()->default_value(std::to_string(rt_config::default_samples_per_pixel)))(
+    "h,help", "Print usage information.");
   auto parse_result = options.parse(argc, argv);
 
   if (parse_result.contains("help")) {
@@ -51,6 +57,19 @@ int main(int argc, char* argv[])
   }
   const int image_height = static_cast<int>(static_cast<double>(image_width) / window_config::aspect_ratio);
 
+  // Validate and set the samples per pixel.
+  const int samples_per_pixel = parse_result["samples-per-pixel"].as<int>();
+  if (samples_per_pixel <= 0) {
+    std::println(std::cerr, "Invalid samples per pixel: {}. Must be a positive integer.", samples_per_pixel);
+    return EXIT_FAILURE;
+  }
+  // Validate and set the maximum bounces.
+  const int max_bounces = parse_result["max-bounces"].as<int>();
+  if (max_bounces <= 0) {
+    std::println(std::cerr, "Invalid max bounces: {}. Must be a positive integer.", max_bounces);
+    return EXIT_FAILURE;
+  }
+
   // Create the world and camera.
   const World world{
     default_world::background_top_colour, default_world::background_bottom_colour, default_world::generate_spheres()
@@ -66,15 +85,17 @@ int main(int argc, char* argv[])
 
   // Determine the output mode and render the scene accordingly.
   const std::string output_mode = parse_result["output-mode"].as<std::string>();
+
   if (output_mode == "window") {
     WindowController window_controller{ image_width, image_height };
     const Renderer renderer{ image_width, image_height, camera };
-    renderer.render_to_window(world, rt_config::samples_per_pixel, rt_config::max_depth, window_controller);
+    renderer.render_to_window(world, samples_per_pixel, max_bounces, window_controller);
+    window_controller.wait_for_quit();
   } else if (output_mode == "ppm") {
     std::ofstream output_file{ parse_result["ppm-output"].as<std::string>() };
     PpmWriter ppm_writer{ image_width, image_height, output_file };
     const Renderer renderer{ image_width, image_height, camera };
-    renderer.render_to_ppm(world, rt_config::samples_per_pixel, rt_config::max_depth, ppm_writer);
+    renderer.render_to_ppm(world, samples_per_pixel, max_bounces, ppm_writer);
     output_file.close();
   } else {
     std::println(std::cerr, "Invalid output mode: '{}'. Expected 'window' or 'ppm'.", output_mode);

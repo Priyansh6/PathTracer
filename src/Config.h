@@ -13,7 +13,9 @@ constexpr std::string id = "path-tracer";
 
 namespace window_config {
 constexpr std::string title = "Path Tracer";
+constexpr int default_width = 1200;// Default width of the window
 constexpr double aspect_ratio = 16.0 / 9.0;// Ratio of width to height
+constexpr int min_frame_time_ms = 16;// Minimum frame time in milliseconds (60 FPS)
 }// namespace window_config
 
 namespace camera_config {
@@ -26,8 +28,8 @@ constexpr double focus_dist = 10;// Distance from camera look_from point to plan
 }// namespace camera_config
 
 namespace rt_config {
-constexpr int samples_per_pixel = 500;// Number of samples per pixel
-constexpr int max_depth = 50;// Maximum bounces per ray
+constexpr int default_samples_per_pixel = 500;// Number of samples per pixel
+constexpr int default_max_depth = 50;// Maximum bounces per ray
 }// namespace rt_config
 
 #endif// CONFIG_H
