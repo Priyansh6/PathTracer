@@ -3,16 +3,16 @@
 
 #include "Camera.h"
 #include "Colour.h"
-#include "PixelWriter.h"
+#include "PpmWriter.h"
+#include "WindowController.h"
 #include "entities/Ray.h"
 #include "entities/World.h"
 
-template<PixelWriter PixelWriter>
 class Renderer
 {
 public:
   Renderer() = delete;
-  explicit Renderer(int image_width, int image_height, const Camera& camera, PixelWriter& pixel_writer);
+  explicit Renderer(int image_width, int image_height, const Camera& camera);
 
   Renderer(const Renderer& other) = delete;
   Renderer(Renderer&& other) noexcept = delete;
@@ -20,7 +20,11 @@ public:
   Renderer& operator=(Renderer&& other) noexcept = delete;
   ~Renderer() = default;
 
-  void render(const World& world, int samples_per_pixel, int max_depth) const;
+  void render_to_ppm(const World& world, int samples_per_pixel, int max_depth, PpmWriter& ppm_writer) const;
+  void render_to_window(const World& world,
+    int samples_per_pixel,
+    int max_depth,
+    WindowController& window_controller) const;
 
 private:
   [[nodiscard]] Colour sample_pixel(int x, int y, const World& world, int samples_per_pixel, int max_depth) const;
@@ -30,7 +34,6 @@ private:
   int m_image_width;
   int m_image_height;
   const Camera& m_camera;
-  PixelWriter& m_pixel_writer;
 };
 
 

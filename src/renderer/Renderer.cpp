@@ -1,47 +1,92 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "Colour.h"
-#include "PixelWriter.h"
-#include "PpmPixelWriter.h"
+#include "PpmWriter.h"
+#include "Tile.h"
+#include "WindowController.h"
 #include "entities/Hittable.h"
 #include "entities/Ray.h"
 #include "entities/Vec3.h"
 #include "entities/World.h"
 #include "materials/Scatter.h"
 
+#include <cstddef>
 #include <iostream>
 #include <limits>
+#include <oneapi/tbb/concurrent_queue.h>
+#include <oneapi/tbb/task_group.h>
 #include <ostream>
 #include <variant>
+#include <vector>
 
 constexpr double shadow_acne_epsilon = 0.0001;// Epsilon to prevent shadow acne.
 
-template<PixelWriter PixelWriter>
-Renderer<PixelWriter>::Renderer(const int image_width,
-  const int image_height,
-  const Camera& camera,
-  PixelWriter& pixel_writer)
-  : m_image_width{ image_width }, m_image_height{ image_height }, m_camera{ camera }, m_pixel_writer(pixel_writer)
+Renderer::Renderer(const int image_width, const int image_height, const Camera& camera)
+  : m_image_width{ image_width }, m_image_height{ image_height }, m_camera{ camera }
 {}
 
-template<PixelWriter PixelWriter>
-void Renderer<PixelWriter>::render(const World& world, const int samples_per_pixel, const int max_depth) const
+void Renderer::render_to_ppm(const World& world,
+  const int samples_per_pixel,
+  const int max_depth,
+  PpmWriter& ppm_writer) const
 {
-  m_pixel_writer.init();
+  std::vector buffer{ static_cast<std::size_t>(m_image_width * m_image_height), rgba::black_rgba };
   for (int y = 0; y < m_image_height; y++) {
     std::print(std::clog, "\rScan Lines remaining: {:0>5}", m_image_height - y);
     std::clog.flush();
     for (int x = 0; x < m_image_width; x++) {
       const Colour pixel_colour = sample_pixel(x, y, world, samples_per_pixel, max_depth);
-      m_pixel_writer.write_pixel(x, y, pixel_colour);
+      buffer[(y * m_image_width) + x] = RGBA{ pixel_colour };
     }
   }
-  m_pixel_writer.cleanup();
+  ppm_writer.write_buffer(buffer);
   std::println(std::clog, "\rDone.                      ");
 }
 
-template<PixelWriter PixelWriter>
-Colour Renderer<PixelWriter>::sample_pixel(const int x,
+
+void Renderer::render_to_window(const World& world,
+  const int samples_per_pixel,
+  const int max_depth,
+  WindowController& window_controller) const
+{
+  if (!window_controller.init()) {
+    std::cerr << "Failed to initialize pixel writer.\n";
+    return;
+  }
+  std::vector<Tile> tiles;
+  for (int y = 0; y < m_image_height; y += tile_size) {
+    for (int x = 0; x < m_image_width; x += tile_size) { tiles.push_back({ .x = x, .y = y }); }
+  }
+  std::size_t remaining_tiles = tiles.size();
+
+  std::vector buffer{ static_cast<std::size_t>(m_image_width * m_image_height), rgba::black_rgba };
+  tbb::concurrent_bounded_queue<Tile> result_tile_queue;
+  tbb::task_group tg;
+
+  for (const Tile& tile : tiles) {
+    tg.run([&] {
+      for (int y = tile.y; y < tile.y + tile_size && y < m_image_height; ++y) {
+        for (int x = tile.x; x < tile.x + tile_size && x < m_image_width; ++x) {
+          const Colour pixel_colour = sample_pixel(x, y, world, samples_per_pixel, max_depth);
+          buffer[(y * m_image_width) + x] = RGBA{ pixel_colour };
+        }
+      }
+
+      result_tile_queue.emplace(tile.x, tile.y);
+    });
+  }
+
+  while (remaining_tiles > 0) {
+    Tile tile{};
+    result_tile_queue.pop(tile);
+    remaining_tiles--;
+    window_controller.present_tile(tile, buffer);
+  }
+
+  tg.wait();
+}
+
+Colour Renderer::sample_pixel(const int x,
   const int y,
   const World& world,
   const int samples_per_pixel,
@@ -56,8 +101,7 @@ Colour Renderer<PixelWriter>::sample_pixel(const int x,
   return pixel_colour;
 }
 
-template<PixelWriter PixelWriter>
-Colour Renderer<PixelWriter>::trace_and_shade(const Ray& r, const World& world, const int max_depth)
+Colour Renderer::trace_and_shade(const Ray& r, const World& world, const int max_depth)
 {
   Colour curr_diffuse_reflection_coefficient = { 1.0, 1.0, 1.0 };
   Ray curr_ray = r;
@@ -84,5 +128,3 @@ Colour Renderer<PixelWriter>::trace_and_shade(const Ray& r, const World& world, 
   // Return black if max depth reached without being absorbed.
   return colour::black;
 }
-
-template class Renderer<PpmPixelWriter>;

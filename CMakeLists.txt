@@ -8,7 +8,15 @@ FetchContent_Declare(
         GIT_TAG release-3.2.16
         SYSTEM
 )
-FetchContent_MakeAvailable(SDL3)
+
+FetchContent_Declare(
+        oneTBB
+        GIT_REPOSITORY https://github.com/uxlfoundation/oneTBB.git
+        GIT_TAG v2022.2.0
+        SYSTEM
+)
+
+FetchContent_MakeAvailable(SDL3 oneTBB)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -30,7 +38,6 @@ set(SOURCES
         src/entities/Ray.cpp
         src/Config.h
         src/renderer/Colour.h
-        src/renderer/Colour.cpp
         src/renderer/Camera.h
         src/renderer/Camera.cpp
         src/entities/Hittable.h
@@ -47,21 +54,32 @@ set(SOURCES
         src/materials/Dielectric.h
         src/renderer/Renderer.cpp
         src/renderer/Renderer.h
-        src/renderer/PixelWriter.h
-        src/renderer/PpmPixelWriter.cpp
-        src/renderer/PpmPixelWriter.h
+        src/renderer/PpmWriter.cpp
+        src/renderer/PpmWriter.h
+        src/renderer/WindowController.cpp
+        src/renderer/WindowController.h
+        src/renderer/Tile.h
 )
 
 add_executable(PathTracer ${SOURCES})
 
-target_link_libraries(PathTracer PRIVATE SDL3::SDL3)
+target_link_libraries(PathTracer PRIVATE SDL3::SDL3 TBB::tbb)
 
-add_custom_command(
-        TARGET PathTracer
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:SDL3::SDL3> $<TARGET_FILE_DIR:PathTracer>
-        COMMENT "Copying SDL3.dll to executable directory"
-)
+if (WIN32)
+    add_custom_command(
+            TARGET PathTracer
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:SDL3::SDL3> $<TARGET_FILE_DIR:PathTracer>
+            COMMENT "Copying SDL3.dll to executable directory"
+    )
+
+    add_custom_command(
+            TARGET PathTracer
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:TBB::tbb> $<TARGET_FILE_DIR:PathTracer>
+            COMMENT "Copying tbb.dll to executable directory"
+    )
+endif ()
 
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 target_include_directories(PathTracer PRIVATE ${SRC_DIR})
