@@ -16,7 +16,14 @@ FetchContent_Declare(
         SYSTEM
 )
 
-FetchContent_MakeAvailable(SDL3 oneTBB)
+FetchContent_Declare(
+        cxxopts
+        GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
+        GIT_TAG v3.3.1
+        SYSTEM
+)
+
+FetchContent_MakeAvailable(SDL3 oneTBB cxxopts)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -63,7 +70,7 @@ set(SOURCES
 
 add_executable(PathTracer ${SOURCES})
 
-target_link_libraries(PathTracer PRIVATE SDL3::SDL3 TBB::tbb)
+target_link_libraries(PathTracer PRIVATE SDL3::SDL3 TBB::tbb cxxopts::cxxopts)
 
 if (WIN32)
     add_custom_command(

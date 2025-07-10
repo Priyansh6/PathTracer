@@ -14,7 +14,6 @@ constexpr std::string id = "path-tracer";
 namespace window_config {
 constexpr std::string title = "Path Tracer";
 constexpr double aspect_ratio = 16.0 / 9.0;// Ratio of width to height
-constexpr int image_width = 1200;// Image width in pixels
 }// namespace window_config
 
 namespace camera_config {
