@@ -23,7 +23,12 @@ FetchContent_Declare(
         SYSTEM
 )
 
+set(TBB_TEST OFF CACHE BOOL "Disable TBB tests")
+
 FetchContent_MakeAvailable(SDL3 oneTBB cxxopts)
+
+target_compile_options(tbb PRIVATE "-Wno-shadow")
+target_compile_options(tbbmalloc PRIVATE "-Wno-shadow")
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
