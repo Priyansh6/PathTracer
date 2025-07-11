@@ -15,6 +15,7 @@ namespace window_config {
 const std::string title = "Path Tracer";// NOLINT(*-err58-cpp)
 constexpr int default_width = 1200;// Default width of the window
 constexpr double aspect_ratio = 16.0 / 9.0;// Ratio of width to height
+constexpr int default_tile_size = 16;// Size of each (square) tile in pixels
 constexpr int min_frame_time_ms = 16;// Minimum frame time in milliseconds (60 FPS)
 }// namespace window_config
 

@@ -28,6 +28,7 @@ public:
   void render_to_window(const World& world,
     int samples_per_pixel,
     int max_depth,
+    int tile_size,
     WindowController& window_controller) const;
 
 private:

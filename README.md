@@ -23,6 +23,7 @@ New features include multithreaded rendering and displaying the image in a windo
 
 Pre-requisites:
 
+- An AVX2 compatible CPU if using MSVC (if you don't have one, remove the /arch:AVX2 flag from the CMake presets)
 - CMake (>= 3.29)
 - Ninja
 - C++-23 compatible compiler (ideally msvc or clang on windows/clang on linux)
@@ -32,7 +33,8 @@ Pre-requisites:
 
 You can build the project automatically using JetBrains CLion, Windows Visual Studio (Code), or manually using CMake.
 To build manually with CMake, run the following commands (for the example preset `windows-clang-release`) in the project
-root directory:
+root directory. This does not work with the `windows-msvc` presets, as they require the Visual Studio generator. You may
+be able to run the commands in a Visual Studio Developer Command Prompt, but this has not been tested.
 
 ```bash
 cmake --preset "windows-clang-release"

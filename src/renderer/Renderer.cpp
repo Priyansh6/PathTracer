@@ -58,6 +58,7 @@ void Renderer::render_to_ppm(const World& world,
 void Renderer::render_to_window(const World& world,
   const int samples_per_pixel,
   const int max_depth,
+  const int tile_size,
   WindowController& window_controller) const
 {
   if (!window_controller.init_window()) {
@@ -96,7 +97,7 @@ void Renderer::render_to_window(const World& world,
     Tile tile{};
     while (result_tile_queue.try_pop(tile)) {
       remaining_tiles--;
-      window_controller.update_tile(tile, buffer);
+      window_controller.update_tile(tile, tile_size, buffer);
       was_updated = true;
     }
     if (was_updated) { window_controller.present(); }

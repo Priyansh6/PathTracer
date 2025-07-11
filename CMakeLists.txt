@@ -6,12 +6,6 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Enable Hot Reload for MSVC compilers if supported.
-if (POLICY CMP0141)
-    cmake_policy(SET CMP0141 NEW)
-    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif ()
-
 include(FetchContent)
 
 FetchContent_Declare(
@@ -43,7 +37,7 @@ FetchContent_MakeAvailable(SDL3 oneTBB cxxopts)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(tbb PRIVATE -Wno-shadow)
     target_compile_options(tbbmalloc PRIVATE -Wno-shadow)
-endif()
+endif ()
 
 set(SOURCES
         src/Main.cpp

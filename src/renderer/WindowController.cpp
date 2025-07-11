@@ -64,7 +64,9 @@ void WindowController::wait_for_quit()
   }
 }
 
-void WindowController::update_tile(const Tile& tile, [[maybe_unused]] const std::vector<RGBA>& buffer)
+void WindowController::update_tile(const Tile& tile,
+  const int tile_size,
+  [[maybe_unused]] const std::vector<RGBA>& buffer)
 {
   // Define the rectangular area of the tile to lock.
   SDL_Rect lock_rect{};

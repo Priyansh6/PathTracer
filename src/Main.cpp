@@ -31,7 +31,9 @@ int main(int argc, char* argv[])
     "The maximum number of bounces per ray.",
     cxxopts::value<int>()->default_value(std::to_string(rt_config::default_max_depth)))("p,samples-per-pixel",
     "The number of ray samples per pixel.",
-    cxxopts::value<int>()->default_value(std::to_string(rt_config::default_samples_per_pixel)))(
+    cxxopts::value<int>()->default_value(std::to_string(rt_config::default_samples_per_pixel)))("s,tile-size",
+    "The size of each tile rendered by a thread.",
+    cxxopts::value<int>()->default_value(std::to_string(window_config::default_tile_size)))(
     "h,help", "Print usage information.");
   auto parse_result = options.parse(argc, argv);
 
@@ -69,6 +71,12 @@ int main(int argc, char* argv[])
     std::println(std::cerr, "Invalid max bounces: {}. Must be a positive integer.", max_bounces);
     return EXIT_FAILURE;
   }
+  // Validate and set the tile size.
+  const int tile_size = parse_result["tile-size"].as<int>();
+  if (tile_size <= 0) {
+    std::println(std::cerr, "Invalid tile size: {}. Must be a positive integer.", tile_size);
+    return EXIT_FAILURE;
+  }
 
   // Create the world and camera.
   const World world{
@@ -89,7 +97,7 @@ int main(int argc, char* argv[])
   if (output_mode == "window") {
     WindowController window_controller{ image_width, image_height };
     const Renderer renderer{ image_width, image_height, camera };
-    renderer.render_to_window(world, samples_per_pixel, max_bounces, window_controller);
+    renderer.render_to_window(world, samples_per_pixel, max_bounces, tile_size, window_controller);
     window_controller.wait_for_quit();
   } else if (output_mode == "ppm") {
     std::ofstream output_file{ parse_result["ppm-output"].as<std::string>() };

@@ -27,7 +27,7 @@ public:
   [[nodiscard]] bool init_window();
   static bool poll_events_until_quit();// Returns true if the quit event was received.
   static void wait_for_quit();
-  void update_tile(const Tile& tile, const std::vector<RGBA>& buffer);
+  void update_tile(const Tile& tile, int tile_size, const std::vector<RGBA>& buffer);
   void present();
 
 private:
