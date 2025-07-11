@@ -1,4 +1,16 @@
 ﻿cmake_minimum_required(VERSION 3.29)
+project(PathTracer)
+
+# Require C++23 and disable extensions for all targets 
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Enable Hot Reload for MSVC compilers if supported.
+if (POLICY CMP0141)
+    cmake_policy(SET CMP0141 NEW)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+endif ()
 
 include(FetchContent)
 
@@ -27,18 +39,11 @@ set(TBB_TEST OFF CACHE BOOL "Disable TBB tests")
 
 FetchContent_MakeAvailable(SDL3 oneTBB cxxopts)
 
-# Enable Hot Reload for MSVC compilers if supported.
-if (POLICY CMP0141)
-    cmake_policy(SET CMP0141 NEW)
-    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif ()
-
-# Require C++23 and disable extensions for all targets 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-project(PathTracer)
+# Suppress '-Wshadow' warning for oneTBB which causes errors with -Werror
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(tbb PRIVATE -Wno-shadow)
+    target_compile_options(tbbmalloc PRIVATE -Wno-shadow)
+endif()
 
 set(SOURCES
         src/Main.cpp
@@ -72,16 +77,10 @@ set(SOURCES
 
 add_executable(PathTracer ${SOURCES})
 
-# 🛠️ Apply compiler-specific warning-as-error flags only to our target
-if (MSVC)
-    target_compile_options(PathTracer PRIVATE /WX)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(PathTracer PRIVATE -Werror)
-endif ()
-
-
 target_link_libraries(PathTracer PRIVATE SDL3::SDL3 TBB::tbb cxxopts::cxxopts)
+target_include_directories(PathTracer PRIVATE "${CMAKE_SOURCE_DIR}/src")
 
+# Copy DLLs on Windows
 if (WIN32)
     add_custom_command(
             TARGET PathTracer
@@ -97,6 +96,3 @@ if (WIN32)
             COMMENT "Copying tbb.dll to executable directory"
     )
 endif ()
-
-set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
-target_include_directories(PathTracer PRIVATE ${SRC_DIR})

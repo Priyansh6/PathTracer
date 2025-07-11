@@ -67,7 +67,7 @@
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl",
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640 /EHsc",
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /EHsc",
         "CMAKE_LINKER": "link"
       }
     },
@@ -79,7 +79,7 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640 /fp:fast /GS- /EHsc",
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /fp:fast /GS- /EHsc",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     },
@@ -91,7 +91,7 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_CXX_COMPILER": "cl",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640 /fp:fast /GS- /EHsc",
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /fp:fast /GS- /EHsc",
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
@@ -104,7 +104,7 @@
         "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl",
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640"
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -125,7 +125,7 @@
         "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640 /fp:fast /GS-"
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /fp:fast /GS-"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -142,7 +142,7 @@
         "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl",
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "/W4 /w14640 /fp:fast /GS-"
+        "CMAKE_CXX_FLAGS": "/W4 /w14640 /WX /fp:fast /GS-"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -159,7 +159,7 @@
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic"
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror"
       }
     },
     {
@@ -171,7 +171,7 @@
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -ffast-math"
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror -ffast-math -flto -march=native"
       }
     },
     {
@@ -183,7 +183,7 @@
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -ffast-math"
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++ -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Werror -ffast-math -flto -march=native"
       }
     }
   ]
