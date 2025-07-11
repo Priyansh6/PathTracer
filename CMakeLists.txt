@@ -27,9 +27,6 @@ set(TBB_TEST OFF CACHE BOOL "Disable TBB tests")
 
 FetchContent_MakeAvailable(SDL3 oneTBB cxxopts)
 
-target_compile_options(tbb PRIVATE "-Wno-shadow")
-target_compile_options(tbbmalloc PRIVATE "-Wno-shadow")
-
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
     cmake_policy(SET CMP0141 NEW)
@@ -74,6 +71,14 @@ set(SOURCES
 )
 
 add_executable(PathTracer ${SOURCES})
+
+# 🛠️ Apply compiler-specific warning-as-error flags only to our target
+if (MSVC)
+    target_compile_options(PathTracer PRIVATE /WX)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(PathTracer PRIVATE -Werror)
+endif ()
+
 
 target_link_libraries(PathTracer PRIVATE SDL3::SDL3 TBB::tbb cxxopts::cxxopts)
 

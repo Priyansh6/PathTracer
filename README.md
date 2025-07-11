@@ -24,9 +24,11 @@ New features include multithreaded rendering and displaying the image in a windo
 Pre-requisites:
 
 - CMake (>= 3.29)
+- Ninja
 - C++-23 compatible compiler (ideally msvc or clang on windows/clang on linux)
 - On Linux if using clang: `clang-tools`, `libc++-dev`, `libc++abi-dev`
-- On Linux, the prerequisites at [this link](https://github.com/libsdl-org/SDL/blob/release-3.2.x/docs/README-linux.md) for the SDL3 library.
+- On Linux, the prerequisites at [this link](https://github.com/libsdl-org/SDL/blob/release-3.2.x/docs/README-linux.md)
+  for the SDL3 library.
 
 You can build the project automatically using JetBrains CLion, Windows Visual Studio (Code), or manually using CMake.
 To build manually with CMake, run the following commands (for the example preset `windows-clang-release`) in the project
@@ -61,7 +63,8 @@ It will render the image in a separate window in real time.
 
 ### Rendering into a PPM file
 
-To render the image into a PPM file, run the following command, specifying your own output file if necessary, as shown below:
+To render the image into a PPM file, run the following command, specifying your own output file if necessary, as shown
+below:
 
 #### In Linux
 
@@ -77,7 +80,8 @@ To render the image into a PPM file, run the following command, specifying your 
 
 ### Other options
 
-To see the list of all the other configurable options (including image width, maximum number of threads, and various ray tracing parameters), use:
+To see the list of all the other configurable options (including image width, maximum number of threads, and various ray
+tracing parameters), use:
 
 #### In Linux
 

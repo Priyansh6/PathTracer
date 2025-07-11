@@ -6,13 +6,13 @@
 #include <string>
 
 namespace app_metadata {
-constexpr std::string name = "Path Tracer";
-constexpr std::string version = "1.0";
-constexpr std::string id = "path-tracer";
+const std::string name = "Path Tracer";// NOLINT(*-err58-cpp)
+const std::string version = "1.0";// NOLINT(*-err58-cpp)
+const std::string id = "path-tracer";// NOLINT(*-err58-cpp)
 }// namespace app_metadata
 
 namespace window_config {
-constexpr std::string title = "Path Tracer";
+const std::string title = "Path Tracer";// NOLINT(*-err58-cpp)
 constexpr int default_width = 1200;// Default width of the window
 constexpr double aspect_ratio = 16.0 / 9.0;// Ratio of width to height
 constexpr int min_frame_time_ms = 16;// Minimum frame time in milliseconds (60 FPS)
