@@ -6,7 +6,7 @@
 
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
-#include <vector>
+#include <span>
 
 // The WindowController class manages the SDL window and renderer.
 // It initializes the window, handles events, and updates the display with rendered tiles.
@@ -27,7 +27,7 @@ public:
   [[nodiscard]] bool init_window();
   static bool poll_events_until_quit();// Returns true if the quit event was received.
   static void wait_for_quit();
-  void update_tile(const Tile& tile, int tile_size, const std::vector<RGBA>& buffer);
+  void update_tile(const Tile& tile, int tile_size, std::span<const RGBA> buffer);
   void present();
 
 private:

@@ -77,8 +77,8 @@ void Renderer::render_to_window(const World& world,
 
   for (const Tile& tile : tiles) {
     tg.run([&, tile] {
-      for (int y = tile.y; y < tile.y + tile_size && y < m_image_height; ++y) {
-        for (int x = tile.x; x < tile.x + tile_size && x < m_image_width; ++x) {
+      for (int y = tile.y; y < tile.y + tile_size && y < m_image_height; y++) {
+        for (int x = tile.x; x < tile.x + tile_size && x < m_image_width; x++) {
           const Colour pixel_colour = sample_pixel(x, y, world, samples_per_pixel, max_depth);
           buffer[(y * m_image_width) + x] = RGBA{ pixel_colour };
         }

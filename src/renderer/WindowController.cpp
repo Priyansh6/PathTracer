@@ -13,9 +13,7 @@
 #include <SDL3/SDL_video.h>
 #include <algorithm>
 #include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <vector>
+#include <span>
 
 WindowController::WindowController(const int width, const int height) : m_width{ width }, m_height{ height } {}
 
@@ -64,16 +62,12 @@ void WindowController::wait_for_quit()
   }
 }
 
-void WindowController::update_tile(const Tile& tile,
-  const int tile_size,
-  [[maybe_unused]] const std::vector<RGBA>& buffer)
+void WindowController::update_tile(const Tile& tile, const int tile_size, const std::span<const RGBA> buffer)
 {
   // Define the rectangular area of the tile to lock.
-  SDL_Rect lock_rect{};
-  lock_rect.x = tile.x;
-  lock_rect.y = tile.y;
-  lock_rect.w = std::min(tile_size, m_width - tile.x);
-  lock_rect.h = std::min(tile_size, m_height - tile.y);
+  const SDL_Rect lock_rect{
+    .x = tile.x, .y = tile.y, .w = std::min(tile_size, m_width - tile.x), .h = std::min(tile_size, m_height - tile.y)
+  };
 
   if (lock_rect.w <= 0 || lock_rect.h <= 0) { return; }
 
@@ -81,16 +75,18 @@ void WindowController::update_tile(const Tile& tile,
   int pitch{};
 
   if (!SDL_LockTexture(m_texture, &lock_rect, &texture_pixels, &pitch)) { return; }
+  const std::size_t row_elems = pitch / sizeof(RGBA);
+  const auto texture_span = std::span{ static_cast<RGBA*>(texture_pixels), row_elems * lock_rect.h };
+
   // Copy the tile's pixel data from the buffer to the texture.
-  for (int y_offset = 0; y_offset < lock_rect.h; ++y_offset) {
-    constexpr int pixel_size = sizeof(RGBA);
+  for (int y_offset = 0; y_offset < lock_rect.h; y_offset++) {
     const int src_y = tile.y + y_offset;
-    const void* src = &buffer[(src_y * m_width) + tile.x];
+    const int src_offset = (src_y * m_width) + tile.x;
+    const std::span<const RGBA> src_span = buffer.subspan(src_offset, lock_rect.w);
 
-    // NOLINTNEXTLINE(*-pro-bounds-pointer-arithmetic)
-    void* dst = static_cast<std::uint8_t*>(texture_pixels) + (static_cast<std::size_t>(y_offset) * pitch);
+    const int dst_offset = y_offset * static_cast<int>(row_elems);
 
-    memcpy(dst, src, static_cast<size_t>(lock_rect.w) * pixel_size);
+    std::ranges::copy(src_span, texture_span.begin() + dst_offset);
   }
   SDL_UnlockTexture(m_texture);
 }
