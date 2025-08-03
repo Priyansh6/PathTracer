@@ -21,14 +21,18 @@ using Point3 = Vec3;
 class Vec3
 {
 public:
-  constexpr Vec3() : m_v{ 0, 0, 0 } {}
+  constexpr Vec3() : m_v{ 0.0 } {}
+  constexpr explicit Vec3(const double val) : m_v{ val, val, val } {}
   constexpr Vec3(const double x, const double y, const double z) : m_v{ x, y, z } {}
 
   [[nodiscard]] constexpr double x() const { return m_v[0]; }
   [[nodiscard]] constexpr double y() const { return m_v[1]; }
   [[nodiscard]] constexpr double z() const { return m_v[2]; }
+  constexpr double& x() { return m_v[0]; }
+  constexpr double& y() { return m_v[1]; }
+  constexpr double& z() { return m_v[2]; }
 
-  constexpr double operator[](const size_t index) const
+  [[nodiscard]] constexpr double operator[](const size_t index) const
   {
     return m_v[index];// NOLINT(*-pro-bounds-constant-array-index)
   }
@@ -59,7 +63,7 @@ public:
     m_v[2] *= val;
     return *this;
   }
-  constexpr Vec3& operator/=(const double val) { return *this *= 1 / val; }
+  constexpr Vec3& operator/=(const double val) { return *this *= 1.0 / val; }
 
   constexpr Vec3 operator+(const Vec3& other) const
   {
@@ -105,7 +109,10 @@ public:
            && (std::abs(m_v[1]) < std::numeric_limits<double>::epsilon())
            && (std::abs(m_v[2]) < std::numeric_limits<double>::epsilon());
   }
-  [[nodiscard]] constexpr Vec3 reflect(const Vec3& normal) const { return *this - (2 * this->dot(normal) * normal); }
+  [[nodiscard]] constexpr Vec3 reflect(const Vec3& normal) const
+  {
+    return *this - (2.0 * this->dot(normal) * normal);// NOLINT(*-magic-numbers)
+  }
   // Precondition: this and the normal are both unit vectors.
   [[nodiscard]] constexpr Vec3 refract(const Vec3& normal, const double etai_over_etat) const
   {
@@ -124,8 +131,8 @@ public:
   {
     while (true) {
       constexpr double min_len_squared = 1e-160;
-      const Vec3 p = random(-1, 1);
-      if (const double len_sq = p.length_squared(); min_len_squared < len_sq && len_sq <= 1) {
+      const Vec3 p = random(-1.0, 1.0);
+      if (const double len_sq = p.length_squared(); min_len_squared < len_sq && len_sq <= 1.0) {
         return p / sqrt(len_sq);
       }
     }

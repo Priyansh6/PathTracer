@@ -19,7 +19,9 @@ public:
     : m_centre{ centre }, m_radius{ std::max(0.0, radius) }, m_material{ material }
   {}
 
-  bool hit(const Ray& r, double min_t, double max_t, HitRecord& rec) const;
+  bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const;
+  [[nodiscard]] Point3 centre() const { return m_centre; }
+  [[nodiscard]] double radius() const { return m_radius; }
 
 private:
   Point3 m_centre;

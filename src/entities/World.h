@@ -5,6 +5,7 @@
 #include "Ray.h"
 #include "Sphere.h"
 #include "Utils.h"
+#include "data_structures/SphereBVH.h"
 #include "materials/Dielectric.h"
 #include "materials/Lambertian.h"
 #include "renderer/Colour.h"
@@ -82,20 +83,12 @@ public:
     const Colour& background_bottom_colour,
     utils::input_range_of<Sphere> auto&& spheres)
     : m_background_top_colour{ background_top_colour }, m_background_bottom_colour{ background_bottom_colour },
-      m_spheres{ std::ranges::to<std::vector<Sphere>>(spheres) } {};
+      m_spheres{ std::ranges::to<std::vector<Sphere>>(spheres) }, m_bvh{ m_spheres } {};
 
   bool hit(const Ray& r, const double t_min, const double t_max, HitRecord& rec) const
   {
-    HitRecord temp_rec{};
-    auto closest_so_far = t_max;
-    for (const Sphere& sphere : m_spheres) {
-      if (sphere.hit(r, t_min, closest_so_far, temp_rec)) {
-        closest_so_far = temp_rec.t;
-        rec = temp_rec;
-      }
-    }
-    return closest_so_far < t_max;
-  };
+    return m_bvh.intersect(r, t_min, t_max, rec);
+  }
   [[nodiscard]] const Colour& background_top_colour() const { return m_background_top_colour; }
   [[nodiscard]] const Colour& background_bottom_colour() const { return m_background_bottom_colour; }
 
@@ -103,6 +96,7 @@ private:
   Colour m_background_top_colour;
   Colour m_background_bottom_colour;
   std::vector<Sphere> m_spheres;
+  SphereBVH m_bvh;
 };
 
 #endif// WORLD_H

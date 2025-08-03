@@ -33,7 +33,6 @@ public:
 
 private:
   [[nodiscard]] Colour sample_pixel(int x, int y, const World& world, int samples_per_pixel, int max_depth) const;
-
   [[nodiscard]] static Colour trace_and_shade(const Ray& r, const World& world, int max_depth);
 
   int m_image_width;

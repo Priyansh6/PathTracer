@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-bool Sphere::hit(const Ray& r, const double min_t, const double max_t, HitRecord& rec) const
+bool Sphere::hit(const Ray& r, const double t_min, const double t_max, HitRecord& rec) const
 {
   const Vec3 oc = m_centre - r.origin();
   const auto a = r.direction().length_squared();
@@ -19,9 +19,9 @@ bool Sphere::hit(const Ray& r, const double min_t, const double max_t, HitRecord
 
   // Find the nearest root that lies (non-inclusive) in the acceptable range.
   auto root = (h - discriminant_sqrt) / a;
-  if (root <= min_t || root >= max_t) {
+  if (root <= t_min || root >= t_max) {
     root = (h + discriminant_sqrt) / a;
-    if (root <= min_t || root >= max_t) { return false; }
+    if (root <= t_min || root >= t_max) { return false; }
   }
 
   rec.t = root;

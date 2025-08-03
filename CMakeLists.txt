@@ -67,6 +67,8 @@ set(SOURCES
         src/renderer/WindowController.cpp
         src/renderer/WindowController.h
         src/renderer/Tile.h
+        src/data_structures/SphereBVH.cpp
+        src/data_structures/SphereBVH.h
 )
 
 add_executable(PathTracer ${SOURCES})
