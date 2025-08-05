@@ -8,10 +8,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
-#include <queue>
 #include <ranges>
 #include <span>
-#include <stack>
 #include <utility>
 #include <vector>
 
@@ -22,14 +20,19 @@ SphereBVH::SphereBVH(const std::span<const Sphere> spheres)
   build_bvh();
 }
 
+thread_local std::vector<std::uint32_t> SphereBVH::m_traversal_stack;
+
 bool SphereBVH::intersect(const Ray& r, const double t_min, const double t_max, HitRecord& rec) const
 {
   auto closest_t = t_max;
 
-  std::stack<std::uint32_t> node_i_queue{ { 0U } };
-  while (!node_i_queue.empty()) {
-    const std::uint32_t node_i = node_i_queue.top();
-    node_i_queue.pop();
+  m_traversal_stack.clear();
+  m_traversal_stack.reserve(m_nodes.size());
+  m_traversal_stack.push_back(0U);
+
+  while (!m_traversal_stack.empty()) {
+    const std::uint32_t node_i = m_traversal_stack.back();
+    m_traversal_stack.pop_back();
     const SphereBVHNode& node = m_nodes[node_i];
 
     if (!intersects_aabb(node, r, t_min, t_max)) { continue; }
@@ -42,8 +45,8 @@ bool SphereBVH::intersect(const Ray& r, const double t_min, const double t_max, 
         }
       }
     } else {
-      node_i_queue.push(node.left_first);
-      node_i_queue.push(node.left_first + 1);
+      m_traversal_stack.push_back(node.left_first);
+      m_traversal_stack.push_back(node.left_first + 1);
     }
   }
 
@@ -52,16 +55,13 @@ bool SphereBVH::intersect(const Ray& r, const double t_min, const double t_max, 
 
 void SphereBVH::build_bvh()
 {
-  SphereBVHNode& root_node = m_nodes[0];
-  root_node.left_first = 0;
-  root_node.sphere_count = m_spheres.size();
-  update_node_bounds(root_node);
-
-  int nodes_used = 1;
-  subdivide(root_node, nodes_used);
+  constexpr std::uint32_t root_node_i = 0U;
+  auto [aabb_min, aabb_max] = get_node_bounds(root_node_i, m_spheres.size());
+  m_nodes.emplace_back(aabb_min, aabb_max, 0U, m_spheres.size());
+  subdivide(m_nodes[root_node_i]);
 }
 
-void SphereBVH::subdivide(SphereBVHNode& node, int& nodes_used)
+void SphereBVH::subdivide(SphereBVHNode& node)
 {
   if (node.sphere_count <= 1) { return; }
 
@@ -74,38 +74,43 @@ void SphereBVH::subdivide(SphereBVHNode& node, int& nodes_used)
   const std::uint32_t left_count = split_i - l;
   if (left_count == 0 || left_count == node.sphere_count) { return; }
 
-  const int left_i = nodes_used++;
-  const int right_i = nodes_used++;
+  const std::uint32_t left_i = m_nodes.size();
 
-  SphereBVHNode& left_child = m_nodes[left_i];
-  SphereBVHNode& right_child = m_nodes[right_i];
-  left_child.left_first = node.left_first;
-  left_child.sphere_count = left_count;
-  right_child.left_first = split_i;
-  right_child.sphere_count = node.sphere_count - left_count;
-  node.sphere_count = 0;
+  const std::uint32_t left_left_first = node.left_first;
+  const std::uint32_t left_sphere_count = left_count;
+  const std::uint32_t right_left_first = split_i;
+  const std::uint32_t right_sphere_count = node.sphere_count - left_count;
+
+  auto [left_aabb_min, left_aabb_max] = get_node_bounds(left_left_first, left_sphere_count);
+  auto [right_aabb_min, right_aabb_max] = get_node_bounds(right_left_first, right_sphere_count);
+
+  m_nodes.emplace_back(left_aabb_min, left_aabb_max, left_left_first, left_sphere_count);
+  m_nodes.emplace_back(right_aabb_min, right_aabb_max, right_left_first, right_sphere_count);
+
+  node.sphere_count = 0U;
   node.left_first = left_i;
 
-  update_node_bounds(left_child);
-  update_node_bounds(right_child);
-
-  subdivide(left_child, nodes_used);
-  subdivide(right_child, nodes_used);
+  subdivide(m_nodes[left_i]);
+  subdivide(m_nodes[left_i + 1]);
 }
 
-void SphereBVH::update_node_bounds(SphereBVHNode& node) const
+std::pair<Point3, Point3> SphereBVH::get_node_bounds(const std::uint32_t first_sphere_i,
+  const std::uint32_t sphere_count) const
 {
-  node.aabb_min = Point3{ std::numeric_limits<double>::max() };
-  node.aabb_max = Point3{ std::numeric_limits<double>::lowest() };
-  for (std::uint32_t i = node.left_first; i < (node.left_first + node.sphere_count); i++) {
+  std::pair<Point3, Point3> bounds;
+  auto& [aabb_min, aabb_max] = bounds;
+  aabb_min = Point3{ std::numeric_limits<double>::max() };
+  aabb_max = Point3{ std::numeric_limits<double>::lowest() };
+  for (std::uint32_t i = first_sphere_i; i < (first_sphere_i + sphere_count); i++) {
     const Sphere& sphere = m_spheres[m_sphere_indices[i]];
-    node.aabb_min.x() = std::min(node.aabb_min.x(), sphere.centre().x() - sphere.radius());
-    node.aabb_min.y() = std::min(node.aabb_min.y(), sphere.centre().y() - sphere.radius());
-    node.aabb_min.z() = std::min(node.aabb_min.z(), sphere.centre().z() - sphere.radius());
-    node.aabb_max.x() = std::max(node.aabb_max.x(), sphere.centre().x() + sphere.radius());
-    node.aabb_max.y() = std::max(node.aabb_max.y(), sphere.centre().y() + sphere.radius());
-    node.aabb_max.z() = std::max(node.aabb_max.z(), sphere.centre().z() + sphere.radius());
+    aabb_min.x() = std::min(aabb_min.x(), sphere.centre().x() - sphere.radius());
+    aabb_min.y() = std::min(aabb_min.y(), sphere.centre().y() - sphere.radius());
+    aabb_min.z() = std::min(aabb_min.z(), sphere.centre().z() - sphere.radius());
+    aabb_max.x() = std::max(aabb_max.x(), sphere.centre().x() + sphere.radius());
+    aabb_max.y() = std::max(aabb_max.y(), sphere.centre().y() + sphere.radius());
+    aabb_max.z() = std::max(aabb_max.z(), sphere.centre().z() + sphere.radius());
   }
+  return bounds;
 }
 
 std::uint32_t SphereBVH::partition_spheres(std::uint32_t l, std::uint32_t r, const int axis, const double split_val)

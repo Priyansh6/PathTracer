@@ -29,10 +29,10 @@ public:
 
 private:
   void build_bvh();
-  void subdivide(SphereBVHNode& node, int& nodes_used);
-  // Sets the aabb_min and aabb_max of the node based on the spheres it contains
-  // Note: Requires that left_first and sphere_count are set correctly
-  void update_node_bounds(SphereBVHNode& node) const;
+  void subdivide(SphereBVHNode& node);
+  // Gets the aabb_min and aabb_max of all spheres in the range [first_sphere_i, first_sphere_i + sphere_count)
+  [[nodiscard]] std::pair<Point3, Point3> get_node_bounds(std::uint32_t first_sphere_i,
+    std::uint32_t sphere_count) const;
   // Partitions the spheres in the range [l, r] (inclusive) based on the split value along the given axis
   // and returns the index of the first sphere in the right partition.
   std::uint32_t partition_spheres(std::uint32_t l, std::uint32_t r, int axis, double split_val);
@@ -44,6 +44,7 @@ private:
   std::span<const Sphere> m_spheres;
   std::vector<std::uint32_t> m_sphere_indices;
   std::vector<SphereBVHNode> m_nodes;
+  thread_local static std::vector<std::uint32_t> m_traversal_stack;
 };
 
 
