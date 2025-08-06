@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <cstdlib>
 #include <limits>
 #include <ranges>
 #include <span>
