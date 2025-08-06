@@ -86,6 +86,10 @@ public:
     return { vec.m_v[0] * val, vec.m_v[1] * val, vec.m_v[2] * val };
   }
   constexpr Vec3 operator/(const double val) const { return { m_v[0] / val, m_v[1] / val, m_v[2] / val }; }
+  constexpr friend Vec3 operator/(const double val, const Vec3& vec)
+  {
+    return { val / vec.m_v[0], val / vec.m_v[1], val / vec.m_v[2] };
+  }
 
   [[nodiscard]] double length() const { return std::sqrt(length_squared()); }
   [[nodiscard]] constexpr double length_squared() const

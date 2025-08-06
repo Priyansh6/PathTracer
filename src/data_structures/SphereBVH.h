@@ -36,7 +36,8 @@ private:
   // Partitions the spheres in the range [l, r] (inclusive) based on the split value along the given axis
   // and returns the index of the first sphere in the right partition.
   std::uint32_t partition_spheres(std::uint32_t l, std::uint32_t r, int axis, double split_val);
-  [[nodiscard]] static bool intersects_aabb(const SphereBVHNode& node, const Ray& r, double t_min, double t_max);
+  [[nodiscard]] static bool
+    intersects_aabb(const SphereBVHNode& node, const Ray& r, const Vec3& r_dir_inv, double t_min, double t_max);
 
   // Finds the best split for the given node and returns the axis and split value.
   [[nodiscard]] static std::pair<int, double> find_best_split(const SphereBVHNode& node);

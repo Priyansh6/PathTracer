@@ -25,6 +25,7 @@ thread_local std::vector<std::uint32_t> SphereBVH::m_traversal_stack;
 bool SphereBVH::intersect(const Ray& r, const double t_min, const double t_max, HitRecord& rec) const
 {
   auto closest_t = t_max;
+  const Vec3 r_dir_inv = 1.0 / r.direction();
 
   m_traversal_stack.clear();
   m_traversal_stack.reserve(m_nodes.size());
@@ -35,7 +36,7 @@ bool SphereBVH::intersect(const Ray& r, const double t_min, const double t_max, 
     m_traversal_stack.pop_back();
     const SphereBVHNode& node = m_nodes[node_i];
 
-    if (!intersects_aabb(node, r, t_min, t_max)) { continue; }
+    if (!intersects_aabb(node, r, r_dir_inv, t_min, t_max)) { continue; }
     if (node.is_leaf()) {
       for (std::uint32_t i = node.left_first; i < (node.left_first + node.sphere_count); i++) {
         HitRecord temp_rec{};
@@ -127,21 +128,25 @@ std::uint32_t SphereBVH::partition_spheres(std::uint32_t l, std::uint32_t r, con
   return l;
 }
 
-bool SphereBVH::intersects_aabb(const SphereBVHNode& node, const Ray& r, double t_min, double t_max)
+bool SphereBVH::intersects_aabb(const SphereBVHNode& node,
+  const Ray& r,
+  const Vec3& r_dir_inv,
+  double t_min,
+  double t_max)
 {
-  const double tx1 = (node.aabb_min.x() - r.origin().x()) / r.direction().x();
-  const double tx2 = (node.aabb_max.x() - r.origin().x()) / r.direction().x();
+  const double tx1 = (node.aabb_min.x() - r.origin().x()) * r_dir_inv.x();
+  const double tx2 = (node.aabb_max.x() - r.origin().x()) * r_dir_inv.x();
 
   t_min = std::max(t_min, std::min(tx1, tx2));
   t_max = std::min(t_max, std::max(tx1, tx2));
 
-  const double ty1 = (node.aabb_min.y() - r.origin().y()) / r.direction().y();
-  const double ty2 = (node.aabb_max.y() - r.origin().y()) / r.direction().y();
+  const double ty1 = (node.aabb_min.y() - r.origin().y()) * r_dir_inv.y();
+  const double ty2 = (node.aabb_max.y() - r.origin().y()) * r_dir_inv.y();
   t_min = std::max(t_min, std::min(ty1, ty2));
   t_max = std::min(t_max, std::max(ty1, ty2));
 
-  const double tz1 = (node.aabb_min.z() - r.origin().z()) / r.direction().z();
-  const double tz2 = (node.aabb_max.z() - r.origin().z()) / r.direction().z();
+  const double tz1 = (node.aabb_min.z() - r.origin().z()) * r_dir_inv.z();
+  const double tz2 = (node.aabb_max.z() - r.origin().z()) * r_dir_inv.z();
   t_min = std::max(t_min, std::min(tz1, tz2));
   t_max = std::min(t_max, std::max(tz1, tz2));
 
