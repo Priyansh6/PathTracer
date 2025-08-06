@@ -129,36 +129,22 @@ std::uint32_t SphereBVH::partition_spheres(std::uint32_t l, std::uint32_t r, con
 
 bool SphereBVH::intersects_aabb(const SphereBVHNode& node, const Ray& r, double t_min, double t_max)
 {
-  constexpr double epsilon = 1e-50;
-
-  if (std::abs(r.direction().x()) < epsilon
-      && (r.origin().x() < node.aabb_min.x() || r.origin().x() > node.aabb_max.x())) {
-    return {};
-  }
   const double tx1 = (node.aabb_min.x() - r.origin().x()) / r.direction().x();
   const double tx2 = (node.aabb_max.x() - r.origin().x()) / r.direction().x();
+
   t_min = std::max(t_min, std::min(tx1, tx2));
   t_max = std::min(t_max, std::max(tx1, tx2));
 
-  if (std::abs(r.direction().y()) < epsilon
-      && (r.origin().y() < node.aabb_min.y() || r.origin().y() > node.aabb_max.y())) {
-    return {};
-  }
   const double ty1 = (node.aabb_min.y() - r.origin().y()) / r.direction().y();
   const double ty2 = (node.aabb_max.y() - r.origin().y()) / r.direction().y();
   t_min = std::max(t_min, std::min(ty1, ty2));
   t_max = std::min(t_max, std::max(ty1, ty2));
 
-  if (std::abs(r.direction().z()) < epsilon
-      && (r.origin().z() < node.aabb_min.z() || r.origin().z() > node.aabb_max.z())) {
-    return {};
-  }
   const double tz1 = (node.aabb_min.z() - r.origin().z()) / r.direction().z();
   const double tz2 = (node.aabb_max.z() - r.origin().z()) / r.direction().z();
   t_min = std::max(t_min, std::min(tz1, tz2));
   t_max = std::min(t_max, std::max(tz1, tz2));
 
-  // If the final interval is valid, we have a hit within the desired range.
   return t_max >= t_min;
 }
 
