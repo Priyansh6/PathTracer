@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <cstdint>
 #include <limits>
-#include <print>
 #include <ranges>
 #include <span>
 #include <utility>
@@ -19,16 +18,14 @@ SphereBVH::SphereBVH(const std::span<const Sphere> spheres)
   : m_spheres{ spheres }, m_sphere_indices(std::views::iota(0U, spheres.size()) | std::ranges::to<std::vector>())
 {
   m_nodes.reserve((2 * m_spheres.size()) - 1);
-  std::println("{}", m_nodes.size());
   build_bvh();
-  std::println("{}", m_nodes.size());
 }
 
 thread_local std::vector<std::uint32_t> SphereBVH::m_traversal_stack;
 
 bool SphereBVH::intersect(const Ray& r, const double t_min, const double t_max, HitRecord& rec) const
 {
-  auto closest_t = t_max;
+  double closest_t = t_max;
   const Vec3 r_dir_reciprocal = 1.0 / r.direction();
 
   m_traversal_stack.clear();
@@ -40,7 +37,6 @@ bool SphereBVH::intersect(const Ray& r, const double t_min, const double t_max, 
     m_traversal_stack.pop_back();
     const SphereBVHNode& node = m_nodes[node_i];
 
-    if (!intersects_aabb(node, r, r_dir_reciprocal, t_min, t_max)) { continue; }
     if (node.is_leaf()) {
       for (std::uint32_t i = node.left_first; i < (node.left_first + node.sphere_count); i++) {
         HitRecord temp_rec{};
@@ -50,8 +46,24 @@ bool SphereBVH::intersect(const Ray& r, const double t_min, const double t_max, 
         }
       }
     } else {
-      m_traversal_stack.push_back(node.left_first);
-      m_traversal_stack.push_back(node.left_first + 1);
+      std::uint32_t left_i = node.left_first;
+      std::uint32_t right_i = node.left_first + 1;
+      const SphereBVHNode& left_node = m_nodes[left_i];
+      const SphereBVHNode& right_node = m_nodes[right_i];
+      double left_t = intersects_aabb(left_node, r, r_dir_reciprocal, t_min, closest_t);
+      double right_t = intersects_aabb(right_node, r, r_dir_reciprocal, t_min, closest_t);
+
+      if (left_t > right_t) {// Make the left node the closer one
+        std::swap(left_t, right_t);
+        std::swap(left_i, right_i);
+      }
+
+      if (right_t < closest_t) {
+        m_traversal_stack.push_back(right_i);
+        m_traversal_stack.push_back(left_i);
+      } else if (left_t < closest_t) {
+        m_traversal_stack.push_back(left_i);
+      }
     }
   }
 
@@ -129,29 +141,29 @@ std::uint32_t SphereBVH::partition_spheres(std::uint32_t l, std::uint32_t r, con
   return l;
 }
 
-bool SphereBVH::intersects_aabb(const SphereBVHNode& node,
+double SphereBVH::intersects_aabb(const SphereBVHNode& node,
   const Ray& r,
   const Vec3& r_dir_reciprocal,
-  double t_min,
-  double t_max)
+  const double t_min,
+  const double t_max)
 {
   const double tx1 = (node.aabb.bmin.x() - r.origin().x()) * r_dir_reciprocal.x();
   const double tx2 = (node.aabb.bmax.x() - r.origin().x()) * r_dir_reciprocal.x();
 
-  t_min = std::max(t_min, std::min(tx1, tx2));
-  t_max = std::min(t_max, std::max(tx1, tx2));
+  double new_t_min = std::max(t_min, std::min(tx1, tx2));
+  double new_t_max = std::min(t_max, std::max(tx1, tx2));
 
   const double ty1 = (node.aabb.bmin.y() - r.origin().y()) * r_dir_reciprocal.y();
   const double ty2 = (node.aabb.bmax.y() - r.origin().y()) * r_dir_reciprocal.y();
-  t_min = std::max(t_min, std::min(ty1, ty2));
-  t_max = std::min(t_max, std::max(ty1, ty2));
+  new_t_min = std::max(new_t_min, std::min(ty1, ty2));
+  new_t_max = std::min(new_t_max, std::max(ty1, ty2));
 
   const double tz1 = (node.aabb.bmin.z() - r.origin().z()) * r_dir_reciprocal.z();
   const double tz2 = (node.aabb.bmax.z() - r.origin().z()) * r_dir_reciprocal.z();
-  t_min = std::max(t_min, std::min(tz1, tz2));
-  t_max = std::min(t_max, std::max(tz1, tz2));
+  new_t_min = std::max(new_t_min, std::min(tz1, tz2));
+  new_t_max = std::min(new_t_max, std::max(tz1, tz2));
 
-  return t_max >= t_min;
+  return new_t_max >= new_t_min ? new_t_min : t_max;
 }
 
 SplitResult SphereBVH::find_best_split(const SphereBVHNode& node) const

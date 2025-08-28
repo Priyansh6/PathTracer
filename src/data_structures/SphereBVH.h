@@ -10,7 +10,6 @@
 #include <cstdint>
 #include <limits>
 #include <span>
-#include <utility>
 #include <vector>
 
 namespace sphere_bvh {
@@ -48,7 +47,7 @@ struct SplitResult
 
 struct SphereBVHNode
 {
-  sphere_bvh::AABB aabb;
+  AABB aabb;
   std::uint32_t left_first{ 0U };// Index of either the first child node or the first sphere in this node
   std::uint32_t sphere_count{ 0U };// Number of speres in this node, or 0 if this is not a leaf node
 
@@ -70,7 +69,7 @@ private:
   // Partitions the spheres in the range [l, r] (inclusive) based on the split value along the given axis
   // and returns the index of the first sphere in the right partition.
   std::uint32_t partition_spheres(std::uint32_t l, std::uint32_t r, int axis, double split_val);
-  [[nodiscard]] static bool intersects_aabb(const sphere_bvh::SphereBVHNode& node,
+  [[nodiscard]] static double intersects_aabb(const sphere_bvh::SphereBVHNode& node,
     const Ray& r,
     const Vec3& r_dir_reciprocal,
     double t_min,
