@@ -42,7 +42,7 @@ To measure the impact of the architectural upgrades, the engine was benchmarked 
 *Note: The "Baseline" measurement below is already faster than the vanilla textbook implementation. Using a profiler,
 the baseline was stripped of bottlenecks, such as replacing deep recursion with an iterative loop, eliminating atomic
 `shared_ptr` reference-counting inside the hot intersection loop, and using std::variant with the visitor pattern (as
-described in [this](https://www.youtube.com/watch?v=PEcy1vYHb8A&t=1811s) CppCon talk).
+described in [this](https://www.youtube.com/watch?v=PEcy1vYHb8A&t=1811s) CppCon talk).*
 
 | Architecture Phase                                                           | Render Time | Speedup (vs Baseline) |
 |:-----------------------------------------------------------------------------|:------------|:----------------------|
