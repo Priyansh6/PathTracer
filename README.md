@@ -2,18 +2,33 @@
 
 ## Description
 
-This is a simple path tracer written in C++ based on the book "Ray Tracing in One Weekend" by Peter Shirley.
-It has been adapted by me to use modern C++ features and to be more performant, modular and extensible.
-New features include multithreaded rendering and displaying the image in a window with real-time updates.
+This is a path tracer written in C++ based on the book *Ray Tracing in One Weekend* by Peter Shirley. It has been
+extensively adapted to leverage modern C++23 features and architected for high performance, modularity, and
+extensibility. It moves beyond the foundational text by implementing a production-style iterative rendering loop, a
+highly optimized acceleration structure, thread-stealing concurrency, and real-time asynchronous window display.
 
 ## Features
 
-**Entities:** Spheres\
-**Materials:** Lambertian (diffuse), Dielectric (transparent), Metal (reflective)\
-**Scenes:** Two scenes provided in `World.h`\
-**Camera:** Positionable camera with adjustable field of view\
-**Performance:** Implements multithreading using the Intel TBB library.\
-**Display:** Real-time updates with the SDL3 library.
+**Architecture & Performance [Custom Engine Upgrades]**
+
+* **Custom BVH:** Built with the Surface Area Heuristic (SAH) using iterative, front-to-back traversal and division-free
+  AABB intersections.
+* **Intel TBB Multithreading:** Tile-based rendering for CPU cache locality, using lock-free `thread_local` RNGs to
+  eliminate thread contention.
+* **Iterative Tracing:** Bounces and scattering use a flat loop with attenuation tracking to prevent call-stack bloat
+  from deep recursion.
+
+**Rendering & Optics**
+
+* **Materials:** Lambertian (diffuse), Metal (reflective with fuzz), and Dielectric (glass using Schlick's
+  approximation).
+* **Cinematic Camera:** Positionable perspective camera with depth of field (defocus blur) and adjustable FOV.
+* **Image Processing:** Multi-sampled anti-aliasing (MSAA) and automatic linear-to-gamma correction.
+
+**Interface & Output [Custom Engine Upgrades]**
+
+* **Real-Time Display:** Live, non-blocking viewport powered by SDL3, alongside traditional offline `.ppm` exports.
+* **CLI Configuration:** Robust runtime customization (threads, bounces, samples, etc.) via `cxxopts`.
 
 ## Default Scene Render
 
@@ -96,3 +111,18 @@ tracing parameters), use:
 ```bash
 ./PathTracer.exe -h
 ```
+
+## Command-Line Arguments
+
+The application exposes several parameters to tune performance and rendering quality at runtime.
+
+| Flag | Name                  | Default      | Description                                                                              |
+|:-----|:----------------------|:-------------|:-----------------------------------------------------------------------------------------|
+| `-m` | `--output-mode`       | `window`     | The output mode for the renderer (`window` or `ppm`).                                    |
+| `-t` | `--max-threads`       | `0`          | Maximum threads for rendering. `0` for auto-detect, or specify an exact integer.         |
+| `-o` | `--ppm-output`        | `output.ppm` | The destination file path when using the `ppm` output mode.                              |
+| `-w` | `--width`             | `1200`       | The width of the resulting image in pixels (height is auto-calculated via aspect ratio). |
+| `-b` | `--max-bounces`       | `50`         | The maximum number of light bounces per ray.                                             |
+| `-p` | `--samples-per-pixel` | `500`        | The number of ray samples evaluated per pixel for anti-aliasing.                         |
+| `-s` | `--tile-size`         | `16`         | The dimension of each square tile rendered by a thread.                                  |
+| `-h` | `--help`              | N/A          | Prints the usage information and argument list.                                          |
