@@ -50,8 +50,6 @@
           "Darwin"
         ]
       },
-      "cacheVariables": {
-      },
       "vendor": {
         "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
           "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"

@@ -34,6 +34,21 @@ highly optimized acceleration structure, thread-stealing concurrency, and real-t
 
 ![Default Scene Render](images/default_scene.png)
 
+## Performance Benchmarks
+
+To measure the impact of the architectural upgrades, the engine was benchmarked rendering the complex "Final Scene" (
+1200x675 resolution, 500 samples per pixel, 50 max bounces).
+
+*Note: The "Baseline" measurement below is already faster than the vanilla textbook implementation. Using a profiler,
+the baseline was stripped of textbook bottlenecks—such as replacing deep recursion with an iterative loop and
+eliminating atomic `shared_ptr` reference-counting inside the hot intersection loop.*
+
+| Architecture Phase                                                           | Render Time | Speedup (vs Baseline) |
+|:-----------------------------------------------------------------------------|:------------|:----------------------|
+| **1. Optimized Baseline** <br>*(Single-threaded, O(N) linear intersections)* | 13m 15.56s  | 1.0x                  |
+| **2. Concurrency** <br>*(Intel TBB Multithreading & Tile Dispatch)*          | 1m 36.99s   | **~8.2x**             |
+| **3. Acceleration** <br>*(TBB + SAH Bounding Volume Hierarchy)*              | **16.99s**  | **~46.8x**            |
+
 ## Build
 
 Pre-requisites:
