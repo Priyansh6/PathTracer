@@ -36,8 +36,8 @@ highly optimized acceleration structure, thread-stealing concurrency, and real-t
 
 ## Performance Benchmarks
 
-To measure the impact of the architectural upgrades, the engine was benchmarked rendering the complex "Final Scene" (
-1200x675 resolution, 500 samples per pixel, 50 max bounces) on an **AMD Ryzen 7 7800X3D** CPU (8 cores, 16 threads).
+To measure the impact of the architectural upgrades, the engine was benchmarked rendering the complex "Final Scene" 
+(1200x675 resolution, 500 samples per pixel, 50 max bounces) on an **AMD Ryzen 7 7800X3D** CPU (8 cores, 16 threads).
 
 *Note: The "Baseline" measurement below is already faster than the vanilla textbook implementation. Using a profiler,
 the baseline was stripped of textbook bottlenecks—such as replacing deep recursion with an iterative loop and
